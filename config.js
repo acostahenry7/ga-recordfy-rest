@@ -16,4 +16,7 @@ module.exports = {
       idle: 10000,
     },
   },
+  security: {
+    secret: process.env.JWT_SCRET || "have-to-create-a-secret!",
+  },
 };

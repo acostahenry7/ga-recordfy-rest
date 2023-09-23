@@ -1,10 +1,12 @@
+const { v4: uuidv4 } = require("uuid");
 const nodemailer = require("nodemailer");
 const TABLE = "auth";
-const { v4: uuidv4 } = require("uuid");
 const verification = require("../../../template/email/verification");
 const { authModel } = require("../../../store/models/auth");
 const { userProfileModel } = require("../../../store/models/user");
 const bcrypt = require("bcryptjs");
+
+const auth = require("../../../auth");
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -94,45 +96,42 @@ module.exports = function (injectedStore) {
       authModel({ username: data.username })
     );
 
-    const [userProfile] = await store.get(
-      "user_profile",
-      userProfileModel(
-        {
-          userProfileId: authProfile[0].user_profile_id,
-        },
-        "find"
-      )
-    );
-
     if (authProfile.length > 0) {
-      return new Promise((resolve, reject) => {
-        if (authProfile[0].verified === true) {
-          bcrypt
-            .compare(data.password, authProfile[0].password)
-            .then((res) => {
-              let authResponse = {
-                username: authProfile[0].username,
-                userProfile,
-              };
+      const [userProfile] = await store.get(
+        "user_profile",
+        userProfileModel(
+          {
+            userProfileId: authProfile[0].user_profile_id,
+          },
+          "find"
+        )
+      );
 
-              if (res === true) {
-                resolve(authResponse);
-              } else {
-                reject(new Error("Invalid username or password!"));
-              }
-            })
-            .catch((err) => {
-              reject(new Error(err.message));
-            });
-        } else {
-          reject(new Error("Not verified!"));
-        }
-      });
+      if (authProfile[0].verified === true) {
+        return bcrypt
+          .compare(data.password, authProfile[0].password)
+          .then((res) => {
+            const accessToken = auth.sign(authProfile[0]);
+            let authResponse = {
+              token: accessToken,
+              username: authProfile[0].username,
+              userProfile,
+            };
+
+            if (res === true) {
+              return authResponse;
+            } else {
+              throw new Error("Invalid username or password!");
+            }
+          })
+          .catch((err) => {
+            throw new Error(err.message);
+          });
+      } else {
+        throw new Error("Not verified!");
+      }
     } else {
-      console.log("errro");
-      return new Promise((resolve, reject) => {
-        reject(new Error("Invalid username or password!"));
-      });
+      throw new Error("Invalid username or password!");
     }
   }
 

@@ -17,9 +17,9 @@ const sequelize = new Sequelize(config.db, config.user, config.password, {
 const db = sequelize;
 
 async function list(table, query) {
-  let res =
-    await db.query(`SELECT user_id, first_name, last_name, email, phone_number, secondary_phone_number, address, 
-                    status, created_by,  to_char(created_at, 'dd TMMonth FMYYYYThh24:mi') as created_at, to_char(modified_at, 'dd TMMonth FMYYYYThh24:mi') as modified_at
+  console.log(query);
+
+  let res = await db.query(`SELECT ${Object.keys(query).join(",")}
     FROM ${table};`);
 
   return res[0];
@@ -61,6 +61,8 @@ async function get(table, whereConditions) {
     console.log(error);
   }
 }
+
+async function getByDateRange(table, field, dateRange) {}
 
 async function insert(table, data) {
   // console.log(table, data);

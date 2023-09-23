@@ -1,5 +1,6 @@
 const TABLE = "user_profile";
 const { v4: uuidv4 } = require("uuid");
+const { userProfileModel } = require("../../../store/models/user");
 
 //User model
 const authModel = (data, id) => {
@@ -8,23 +9,6 @@ const authModel = (data, id) => {
     username: data.username,
     password: data.password,
     user_profile_id: id,
-  };
-};
-
-const userProfileModel = (data, id) => {
-  return {
-    user_profile_id: id || data.id || "",
-    first_name: data.firstName || "",
-    last_name: data.lastName || "",
-    email: data.email || "",
-    phone_number: data.phoneNumber || "",
-    secondary_phone_number: data.secondaryPhoneNumber || "",
-    address: data.address || "",
-    status: data.status || "CREATED",
-    created_by: data.createdBy || "",
-    created_at: data.createdAt || "",
-    modified_by: data.modifiedBy || "",
-    modified_at: data.modifiedAt || "",
   };
 };
 
@@ -37,12 +21,12 @@ module.exports = function (injectedStore) {
   }
 
   function list() {
-    return store.list(TABLE);
+    return store.list(TABLE, userProfileModel({}, "find"));
   }
 
   function get(queryParams) {
     // console.log(queryParams);
-    const conditions = userProfileModel(queryParams);
+    const conditions = userProfileModel(queryParams, "find");
     console.log(conditions);
 
     return store.get(TABLE, conditions);

@@ -1,9 +1,10 @@
 const express = require("express");
 const router = express.Router();
+const secure = require("./secure");
 const response = require("../../../network/response");
 const controller = require("./index");
 
-router.get("/", (req, res) => {
+router.get("/", secure.canList, (req, res) => {
   console.log("USER NETWORK GET ", req.query);
   if (Object.keys(req.query).length > 0) {
     controller
