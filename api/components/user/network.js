@@ -1,10 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const secure = require("./secure");
+const { verifyToken } = require("../../../auth");
+const { isOwner } = require("./secure");
 const response = require("../../../network/response");
 const controller = require("./index");
 
-router.get("/", secure.canList, (req, res) => {
+router.get("/", verifyToken, (req, res) => {
   console.log("USER NETWORK GET ", req.query);
   if (Object.keys(req.query).length > 0) {
     controller
@@ -35,6 +36,17 @@ router.post("/", (req, res) => {
     })
     .catch((error) => {
       response.error(req, res, error.message, 500);
+    });
+});
+
+router.put("/:id", [verifyToken, isOwner], (req, res) => {
+  controller
+    .update(req.params.id, req.body)
+    .then((msg) => {
+      response.success(req, res, msg, 200);
+    })
+    .catch((err) => {
+      response.error(req, res, err.message, err.statusCode);
     });
 });
 

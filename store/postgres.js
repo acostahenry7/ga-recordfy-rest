@@ -20,17 +20,19 @@ async function list(table, query) {
   console.log(query);
 
   let res = await db.query(`SELECT ${Object.keys(query).join(",")}
-    FROM ${table};`);
+    FROM ${table}
+    WHERE status not like 'DELETED';`);
 
   return res[0];
 }
 
 async function get(table, whereConditions) {
+  console.log(whereConditions);
   try {
     let whereString = "";
     Object.entries(whereConditions).forEach((condition, index) => {
       if (index == 0) {
-        whereString = `WHERE ${condition[0]} like '%${condition[1]}%'`;
+        whereString = `WHERE lower(${condition[0]}) like '%${condition[1]}%'`;
       } else {
         if (condition[0].toLowerCase().includes("at")) {
           whereString +=
@@ -40,7 +42,7 @@ async function get(table, whereConditions) {
         } else {
           whereString +=
             condition[1]?.length > 0
-              ? `AND lower(${condition[0]}) LIKE '${
+              ? `AND lower(${condition[0]}) LIKE '%${
                   condition[1].toLowerCase() + "%"
                 }' `
               : "";
@@ -50,6 +52,9 @@ async function get(table, whereConditions) {
       return whereString;
     });
 
+    if (table !== "auth") {
+      whereString += "AND status not like 'DELETED'";
+    }
     let query = `SELECT ${Object.keys(whereConditions).join()}
                       FROM ${table}
                       ${whereString}`;
@@ -81,13 +86,11 @@ async function insert(table, data) {
   }
 }
 
-async function update(table, data) {
+async function update(table, id, data) {
   try {
     let updateFields = "";
     let fieldHistory = [];
     Object.entries(data).forEach((item, index) => {
-      console.log(item[0]);
-
       updateFields +=
         item[1]?.toString().length > 0 && item[0] != `${table}_id`
           ? `${index != 0 && fieldHistory.length > 0 ? ", " : ""}${item[0]} = ${
@@ -102,15 +105,13 @@ async function update(table, data) {
       return updateFields;
     });
 
-    let queryString = `UPDATE ${table} SET ${updateFields} WHERE ${table}_id = '${
-      data[table + "_id"]
-    }'`;
+    let queryString = `UPDATE ${table} SET ${updateFields} WHERE ${table}_id = '${id}'`;
 
     console.log(queryString);
     await db.query(queryString);
     return data;
   } catch (error) {
-    console.log(error);
+    throw error;
   }
 }
 

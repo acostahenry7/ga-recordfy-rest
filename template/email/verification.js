@@ -100,7 +100,7 @@ module.exports = (params) => {
           de más abajo ↓</b
         >
       </p>
-      <a href="https://h6v791zx-3001.use2.devtunnels.ms/api/auth/verify?${params.queryParams}" rel="nofollow" target="blank">Verificar mi cuenta</a>
+      <a href="https://qqjqh0pn-3001.use2.devtunnels.ms/api/auth/verify?${params.queryParams}" rel="nofollow" target="blank">Verificar mi cuenta</a>
     </div>
   </body>
 </html>

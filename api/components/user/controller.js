@@ -1,18 +1,7 @@
 const TABLE = "user_profile";
 const { v4: uuidv4 } = require("uuid");
 const { userProfileModel } = require("../../../store/models/user");
-
-//User model
-const authModel = (data, id) => {
-  return {
-    auth_id: uuidv4(),
-    username: data.username,
-    password: data.password,
-    user_profile_id: id,
-  };
-};
-
-//La lógica de negocio va a aquí
+const error = require("../../../utils/error");
 
 module.exports = function (injectedStore) {
   let store = injectedStore;
@@ -54,6 +43,19 @@ module.exports = function (injectedStore) {
     // return
   }
 
+  async function update(id, data) {
+    const userProfile = await store.get(
+      TABLE,
+      userProfileModel({ userProfileId: id }, "find")
+    );
+
+    if (userProfile.length > 0) {
+      return store.update(TABLE, id, userProfileModel(data, "update"));
+    } else {
+      throw error("User does not exists!", 400);
+    }
+  }
+
   function remove(id) {
     return store.remove(TABLE, id);
   }
@@ -62,6 +64,7 @@ module.exports = function (injectedStore) {
     list,
     get,
     insert,
+    update,
     remove,
   };
 };

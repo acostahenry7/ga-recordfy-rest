@@ -5,6 +5,7 @@ const verification = require("../../../template/email/verification");
 const { authModel } = require("../../../store/models/auth");
 const { userProfileModel } = require("../../../store/models/user");
 const bcrypt = require("bcryptjs");
+const error = require("../../../utils/error");
 
 const auth = require("../../../auth");
 
@@ -75,18 +76,16 @@ module.exports = function (injectedStore) {
 
       transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
-          console.log(error);
+          throw new Error(error);
         } else {
-          console.log("Email sent: " + info.response);
+          console.log(info);
         }
       });
 
-      return new Promise((resolve) => {
-        resolve("Email sent");
-      });
-      // return store.get("user_profile", {
-      //   user_profile_id: userProfile.user_profile_id,
-      // });
+      return store.get(
+        "user_profile",
+        userProfileModel({ userProfileId: userProfile.user_profile_id }, "find")
+      );
     }
   }
 
@@ -128,11 +127,17 @@ module.exports = function (injectedStore) {
             throw new Error(err.message);
           });
       } else {
-        throw new Error("Not verified!");
+        throw error("Not authorized! Missing verification", 401);
       }
     } else {
       throw new Error("Invalid username or password!");
     }
+  }
+
+  async function signout() {
+    return {
+      token: "",
+    };
   }
 
   async function verify(params) {
@@ -147,19 +152,15 @@ module.exports = function (injectedStore) {
       if (authProfile[0].verification_token === params.verificationToken) {
         await store.update(
           TABLE,
+          authProfile[0].auth_id,
           authModel({
-            authId: authProfile[0].auth_id,
             verified: true,
           })
         );
 
-        return new Promise((resolve, reject) => {
-          resolve();
-        });
+        return;
       } else {
-        return new Promise((resolve, reject) => {
-          reject();
-        });
+        throw error("Bad verification token", 400);
       }
     }
   }
@@ -169,6 +170,7 @@ module.exports = function (injectedStore) {
   return {
     signup,
     signin,
+    signout,
     verify,
   };
 };

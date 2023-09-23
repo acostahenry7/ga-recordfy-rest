@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const response = require("../../../network/response");
 const controller = require("./index");
+const { verifyToken } = require("../../../auth");
 
 router.post("/signup", (req, res) => {
   controller
@@ -22,9 +23,23 @@ router.post("/signin", (req, res) => {
       response.success(req, res, message, 200);
     })
     .catch((err) => {
-      response.error(req, res, err.message, 500);
+      response.error(req, res, err.message, err.statusCode);
     });
 });
+
+router.post(
+  "/signout",
+  /*verifyToken,*/ (req, res) => {
+    controller
+      .signout()
+      .then((msg) => {
+        response.success(req, res, msg, 200);
+      })
+      .catch((err) => {
+        response.error(req, res, err.message, err.statusCode);
+      });
+  }
+);
 
 router.get("/verify", (req, res) => {
   console.log("token", req.query);
