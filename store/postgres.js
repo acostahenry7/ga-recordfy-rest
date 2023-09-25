@@ -32,12 +32,23 @@ async function get(table, whereConditions) {
     let whereString = "";
     Object.entries(whereConditions).forEach((condition, index) => {
       if (index == 0) {
-        whereString = `WHERE lower(${condition[0]}) like '%${condition[1]}%'`;
+        if (condition[0].includes("id") && condition[1].length > 0) {
+          whereString = `WHERE lower(${condition[0]}) like '${condition[1]}'`;
+        } else {
+          whereString = `WHERE lower(${condition[0]}) like '%${condition[1]}%'`;
+        }
       } else {
         if (condition[0].toLowerCase().includes("at")) {
           whereString +=
             condition[1]?.length > 0
               ? `AND ${condition[0]} = '${condition[1]}' `
+              : "";
+        } else if (condition[0].includes("id")) {
+          whereString +=
+            condition[1]?.length > 0
+              ? `AND lower(${
+                  condition[0]
+                }) LIKE '${condition[1].toLowerCase()}' `
               : "";
         } else {
           whereString +=
