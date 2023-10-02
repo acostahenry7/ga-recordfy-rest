@@ -1,6 +1,7 @@
 const express = require("express");
 const config = require("../config");
 const bodyParser = require("body-parser");
+const cors = require("cors");
 
 //Microservices components
 const auth = require("./components/auth/network");
@@ -16,6 +17,7 @@ const app = express();
 
 //Middleware
 app.use(bodyParser.json());
+app.use(cors({ origin: "*" }));
 
 //Router
 app.use("/api/user", user);

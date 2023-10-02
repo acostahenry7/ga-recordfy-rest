@@ -38,12 +38,12 @@ async function get(table, whereConditions) {
           whereString = `WHERE lower(${condition[0]}) like '%${condition[1]}%'`;
         }
       } else {
-        if (condition[0].toLowerCase().includes("at")) {
+        if (condition[0].toLowerCase().includes("_at")) {
           whereString +=
             condition[1]?.length > 0
               ? `AND ${condition[0]} = '${condition[1]}' `
               : "";
-        } else if (condition[0].includes("id")) {
+        } else if (condition[0].includes("_id")) {
           whereString +=
             condition[1]?.length > 0
               ? `AND lower(${
