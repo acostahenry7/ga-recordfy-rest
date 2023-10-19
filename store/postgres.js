@@ -16,60 +16,68 @@ const sequelize = new Sequelize(config.db, config.user, config.password, {
 
 const db = sequelize;
 
-async function list(table, query) {
-  console.log(query);
+async function list(table, query, options) {
+  if (options) {
+    var { joinTable, joinBy, joinConditions } = options;
+  }
 
-  let res = await db.query(`SELECT ${Object.keys(query).join(",")}
+  let res = await db.query(`SELECT ${Object.keys(query).map(
+    (i) => `${table}.${i}`
+  )} ${
+    joinConditions
+      ? "," +
+        Object.keys(joinConditions).map(
+          (i) => `${joinTable}.${i} as customer_${i}`
+        )
+      : ""
+  }   
     FROM ${table}
-    WHERE status not like 'DELETED';`);
+    ${
+      joinTable
+        ? `JOIN ${joinTable} ON (${table}.${joinBy} = ${joinTable}.${joinBy})`
+        : ""
+    }
+    WHERE ${table}.status not like 'DELETED';`);
 
   return res[0];
 }
 
-async function get(table, whereConditions) {
-  console.log(whereConditions);
-  try {
-    let whereString = "";
-    Object.entries(whereConditions).forEach((condition, index) => {
-      if (index == 0) {
-        if (condition[0].includes("id") && condition[1].length > 0) {
-          whereString = `WHERE lower(${condition[0]}) like '${condition[1]}'`;
-        } else {
-          whereString = `WHERE lower(${condition[0]}) like '%${condition[1]}%'`;
-        }
-      } else {
-        if (condition[0].toLowerCase().includes("_at")) {
-          whereString +=
-            condition[1]?.length > 0
-              ? `AND ${condition[0]} = '${condition[1]}' `
-              : "";
-        } else if (condition[0].includes("_id")) {
-          whereString +=
-            condition[1]?.length > 0
-              ? `AND lower(${
-                  condition[0]
-                }) LIKE '${condition[1].toLowerCase()}' `
-              : "";
-        } else {
-          whereString +=
-            condition[1]?.length > 0
-              ? `AND lower(${condition[0]}) LIKE '%${
-                  condition[1].toLowerCase() + "%"
-                }' `
-              : "";
-        }
-      }
+async function get(table, whereConditions, options) {
+  if (options) {
+    var { joinTable, joinBy, joinConditions } = options;
+  }
 
-      return whereString;
-    });
+  try {
+    let whereString = generateWhereConditions(whereConditions, true);
 
     if (table !== "auth") {
-      whereString += "AND status not like 'DELETED'";
+      whereString += `AND ${table}.status not like 'DELETED'`;
     }
-    let query = `SELECT ${Object.keys(whereConditions).join()}
+    let query = `SELECT  ${Object.keys(whereConditions).map(
+      (i) => `${table}.${i}`
+    )} 
+    ${
+      joinConditions
+        ? "," +
+          Object.keys(joinConditions).map(
+            (i) => `${joinTable}.${i} as customer_${i}`
+          )
+        : ""
+    } 
                       FROM ${table}
-                      ${whereString}`;
+                      ${
+                        joinTable
+                          ? `JOIN ${joinTable} ON (${table}.${joinBy} = ${joinTable}.${joinBy})`
+                          : ""
+                      }
+                      ${whereString}
+                      ${
+                        joinConditions
+                          ? generateWhereConditions(joinConditions)
+                          : ""
+                      }`;
 
+    console.log("QUERY...........", query);
     let res = await db.query(query);
 
     return res[0];
@@ -77,8 +85,6 @@ async function get(table, whereConditions) {
     console.log(error);
   }
 }
-
-async function getByDateRange(table, field, dateRange) {}
 
 async function insert(table, data) {
   // console.log(table, data);
@@ -128,10 +134,62 @@ async function update(table, id, data) {
 
 async function remove(table, id) {}
 
+async function getCustomQuery(queryString) {
+  try {
+    const response = await db.query(queryString);
+
+    return response[0];
+  } catch (error) {
+    throw error;
+  }
+}
+
 function getQueryDefaultString(table) {
   return table != "auth"
     ? `,to_char(created_at, 'dd TMMonth FMYYYYThh24:mi') as created_at, to_char(modified_at, 'dd TMMonth FMYYYYThh24:mi') as modified_at`
     : "";
+}
+
+function generateWhereConditions(obj, needWhereStatement) {
+  let whereString = "";
+
+  Object?.entries(obj).forEach((condition, index) => {
+    if (index === 0 && needWhereStatement === true) {
+      if (condition[0] != "first_name" || condition[0] != "last_name") {
+        if (condition[0].includes("id") && condition[1].length > 0) {
+          whereString = `WHERE lower(${condition[0]}) like '${condition[1]}'`;
+        } else {
+          whereString = `WHERE lower(${condition[0]}) like '%${condition[1]}%'`;
+        }
+      } else {
+        if (condition[0].toLowerCase().includes("_at")) {
+          whereString +=
+            condition[1]?.length > 0
+              ? `AND ${condition[0]} = '${condition[1]}' `
+              : "";
+        } else if (condition[0].includes("_id")) {
+          whereString +=
+            condition[1]?.length > 0
+              ? `AND lower(${
+                  condition[0]
+                }) LIKE '${condition[1].toLowerCase()}' `
+              : "";
+        } else {
+          whereString +=
+            condition[1]?.length > 0
+              ? `AND lower(${condition[0]}) LIKE '%${
+                  condition[1].toLowerCase() + "%"
+                }' `
+              : "";
+        }
+      }
+    }
+  });
+
+  if (obj.first_name || obj.last_name) {
+    whereString += `AND lower(first_name || ' ' || last_name ) LIKE '%${obj.first_name}%'`;
+  }
+  return whereString;
 }
 
 module.exports = {
@@ -140,4 +198,5 @@ module.exports = {
   insert,
   update,
   remove,
+  getCustomQuery,
 };

@@ -9,11 +9,26 @@ module.exports = function (injectedStore) {
   }
 
   async function list() {
-    return store.list(TABLE, recordModel({}, "find"));
+    const record = await store.list(TABLE, recordModel({}, "find"), {
+      joinTable: "customer",
+      joinBy: "customer_id",
+      joinConditions: customerModel({}, "find"),
+    });
+
+    console.log(record);
+    const response = [...record];
+    return response;
   }
 
   async function get(data) {
-    const record = await store.get(TABLE, recordModel(data, "find"));
+    const record = await store.get(TABLE, recordModel(data, "find"), {
+      joinTable: "customer",
+      joinBy: "customer_id",
+      joinConditions: customerModel(data, "find"),
+    });
+
+    console.log(record);
+    const response = [...record];
 
     if (record.length > 0) {
       return record;

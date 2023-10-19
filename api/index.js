@@ -7,6 +7,7 @@ const cors = require("cors");
 const auth = require("./components/auth/network");
 const user = require("./components/user/network");
 const customerType = require("./components/customerType/network");
+const customerFileType = require("./components/customerFileType/network");
 const customer = require("./components/customer/network");
 const fileType = require("./components/fileType/network");
 const recordFile = require("./components/recordFile/network");
@@ -22,8 +23,9 @@ app.use(cors({ origin: "*" }));
 //Router
 app.use("/api/user", user);
 app.use("/api/auth", auth);
-app.use("/api/customer-type", customerType);
 app.use("/api/customer", customer);
+app.use("/api/customer-type", customerType);
+app.use("/api/customer-file-type", customerFileType);
 app.use("/api/file-type", fileType);
 app.use("/api/record-file", recordFile);
 app.use("/api/record", record);
