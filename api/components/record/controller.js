@@ -2,6 +2,8 @@ const TABLE = "record";
 const { recordModel } = require("../../../store/models/record");
 const { customerModel } = require("../../../store/models/customer");
 
+const { listDetailedRecords } = require("../../../store/queries/record");
+
 module.exports = function (injectedStore) {
   let store = injectedStore;
   if (!store) {
@@ -9,11 +11,13 @@ module.exports = function (injectedStore) {
   }
 
   async function list() {
-    const record = await store.list(TABLE, recordModel({}, "find"), {
-      joinTable: "customer",
-      joinBy: "customer_id",
-      joinConditions: customerModel({}, "find"),
-    });
+    // const record = await store.list(TABLE, recordModel({}, "find"), {
+    //   joinTable: "customer",
+    //   joinBy: "customer_id",
+    //   joinConditions: customerModel({}, "find"),
+    // });
+
+    const record = await store.getCustomQuery(listDetailedRecords);
 
     console.log(record);
     const response = [...record];
@@ -21,11 +25,25 @@ module.exports = function (injectedStore) {
   }
 
   async function get(data) {
-    const record = await store.get(TABLE, recordModel(data, "find"), {
-      joinTable: "customer",
-      joinBy: "customer_id",
-      joinConditions: customerModel(data, "find"),
-    });
+    // const record = await store.getCustomQuery(TABLE, recordModel(data, "find"), {
+    //   joinTables: [
+    //     {
+    //       name: "customer",
+    //       joinBy: "customer_id",
+    //       joinConditions: customerModel(data, "find"),
+    //     },
+    //     // {
+    //     //   name: "record_file",
+    //     //   joinWith: "",
+    //     //   joinBy: "record_id",
+    //     //   joinConditions: recordFileModel(data, "find"),
+    //     // },
+    //   ],
+    // });
+
+    const record = await store.getCustomQuery(
+      listDetailedRecords({ ...recordModel(data), ...customerModel(data) })
+    );
 
     console.log(record);
     const response = [...record];
@@ -38,10 +56,9 @@ module.exports = function (injectedStore) {
   }
 
   async function insert(data) {
-    const record = await store.get(
-      TABLE,
-      recordModel({ ...data, status: "CREATED" }, "find")
-    );
+    const record = await store.get(TABLE, recordModel({ ...data }, "find"));
+
+    console.log(recordModel({ ...data }));
 
     if (record.length > 0) {
       throw new Error("record already exists!");

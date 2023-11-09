@@ -1,0 +1,110 @@
+Reportes a trabajar
+Notas:
+-En todos los reportes lleva el filtro por sucursal, préstamo, cédula, cliente...
+
+
+/********* CLIENTES, PRÉSTAMOS Y COBROS **********/
+
+1) Clientes en atraso *
+	-Cliente
+	-Numero teléfono
+	-Fecha préstamo
+	-Monto préstamo
+	-Monto cuota
+	-Cantidad de cuotas
+	-Cuotas pagadas
+	-Cuotas en atraso
+	-Porcentaje de atraso
+	-Vencido desde (primer cuota en atraso)
+	-Monto vencido
+2) Préstamos pagos del día (Préstamos que deben ser pagados en la fecha seleccionada, "POR DEFECTO LOS DEL DIA")
+(Proyección de pagos del dia/Total cobrado del día "Gráfico barra")*
+	-Nombre del cliente(Cédula)
+	-Teléfono(s)
+	-Número de préstamo
+	-Monto del préstamo
+	-Cuota pendiente (ej: n-n "PUEDE MOSTRAR UN RANGO")
+	-Monto cuota
+	-Zona
+	-Fecha de pago
+3) Reporte de pagos cancelados (gráfico pastel) *reverse_employee*
+	-Número de préstamo
+	-Número de recibo
+	-Empleado
+	-Fecha de cancelación
+	-Comentario
+	-Estado
+4) Reporte de préstamos por situación y estado *
+	-(Información del show con gŕaficos agregados)
+	
+5) Reporte de pagos recibidos (Grafico linea)*
+	-Nombre cliente
+	-Número de préstamo
+	-Zona
+	-Cajero
+	-Número de recibo
+	-Tipo de pago
+	-Fecha recibo
+	-Cuotas pagadas
+	-Abono a cuota
+	-Descuento
+	-Mora pagada
+	-Monto recibido
+	-Devuelta
+6) Reporte de tendencia de cobros (POR DEFECTO MUESTRA LA EFICACIA DE LA FECHA ACTUAL, Filtros: Rango de fecha, Cobrador, zona)*revisión*
+	-Nombre cobrador
+	-Cantidad de préstamos en su zona
+	-Proyección de cobro
+	-Total cobrado
+	-Total pendiente por cobrar
+	-Porcentaje de eficacia de cobro
+7) Reporte Histórico control de cobros*
+	-Cliente
+	-Número de préstamo
+	-Empleado
+	-Fecha comentario
+	-Comentario
+	-Tipo de comentario
+	-Tipo de carta
+	-Fecha de compromiso
+	
+8) Reportes solicitudes de préstamos
+	-Datos del cliente
+	-Datos cónyugue
+	-Datos del garante
+	-Datos del negocio
+	-Documentos agregados
+	-Fecha solicitud
+	-Estado solicitud
+	-Empleado
+
+
+//Segunda etapa 04-11-2023
+	
+9) Acciones al préstamo (activity_loan)*
+	- Cliente
+	- Préstamo
+   	- Tipo de acción
+   	- Nota/Commentario
+   	- Empleado
+   	- Fecha de la acción
+   
+10) Descuentos hechos a un préstamo (amortization_discount)*
+	- Cliente
+	- Préstamo
+	- Tipo descuento
+	- Monto descuento
+	- Comentario/descripción
+	- Empleado
+	- Fecha de modificación
+	- Estado
+	
+11) Alertas (alerts)*
+	- Tipo de alerta
+	- Descripción (trim to extract)
+	- Empleado (employee_id)
+	- Fecha 
+	
+12) 
+
+	

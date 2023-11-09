@@ -44,7 +44,7 @@ async function list(table, query, options) {
 
 async function get(table, whereConditions, options) {
   if (options) {
-    var { joinTable, joinBy, joinConditions } = options;
+    var { joinTables } = options;
   }
 
   try {
@@ -56,26 +56,27 @@ async function get(table, whereConditions, options) {
     let query = `SELECT  ${Object.keys(whereConditions).map(
       (i) => `${table}.${i}`
     )} 
+    ${joinTables?.length > 0 ? "," : ""}
     ${
-      joinConditions
-        ? "," +
-          Object.keys(joinConditions).map(
-            (i) => `${joinTable}.${i} as customer_${i}`
-          )
-        : ""
-    } 
-                      FROM ${table}
-                      ${
-                        joinTable
-                          ? `JOIN ${joinTable} ON (${table}.${joinBy} = ${joinTable}.${joinBy})`
-                          : ""
-                      }
-                      ${whereString}
-                      ${
-                        joinConditions
-                          ? generateWhereConditions(joinConditions)
-                          : ""
-                      }`;
+      joinTables?.map((jt) =>
+        jt.joinConditions
+          ? Object.keys(jt.joinConditions).map(
+              (i) => `${jt.name}.${i} as ${jt.name}_${i}`
+            )
+          : ""
+      ) || ""
+    }
+    FROM ${table}
+    ${
+      joinTables
+        ?.map(
+          (jt) =>
+            `JOIN ${jt.name} ON (${table}.${jt.joinBy} = ${jt.name}.${jt.joinBy})`
+        )
+        .join("\n") || ""
+    }
+      ${whereString}
+    `;
 
     console.log("QUERY...........", query);
     let res = await db.query(query);
@@ -96,10 +97,11 @@ async function insert(table, data) {
                          .join(",")})`;
 
     let res = await db.query(queryString);
-    console.log(res);
+    console.log("INSERT RESPONSE", res);
     return data;
   } catch (error) {
     console.log(error);
+    throw new Error(error.errors[0].message);
   }
 }
 
@@ -151,6 +153,8 @@ function getQueryDefaultString(table) {
 }
 
 function generateWhereConditions(obj, needWhereStatement) {
+  console.log("GENERATE", obj);
+
   let whereString = "";
 
   Object?.entries(obj).forEach((condition, index) => {
@@ -161,7 +165,9 @@ function generateWhereConditions(obj, needWhereStatement) {
         } else {
           whereString = `WHERE lower(${condition[0]}) like '%${condition[1]}%'`;
         }
-      } else {
+      }
+    } else {
+      if (condition[0] != "first_name" && condition[0] != "last_name") {
         if (condition[0].toLowerCase().includes("_at")) {
           whereString +=
             condition[1]?.length > 0

@@ -7,7 +7,7 @@ const customerTypeFileModel = (data, mode) => {
     case "create":
       customerTypeFile = {
         customer_type_file_id: uuidv4(),
-        customer_type_id: data.fileTypeId,
+        customer_type_id: data.customerTypeId,
         file_type_id: data.fileTypeId,
         status: "CREATED",
       };

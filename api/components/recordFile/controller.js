@@ -2,6 +2,9 @@ const TABLE = "record_file";
 const { recordFileModel } = require("../../../store/models/recordFile");
 const { recordModel } = require("../../../store/models/record");
 const { fileTypeModel } = require("../../../store/models/fileType");
+const {
+  listDetailedRecordFiles,
+} = require("../../../store/queries/recordFile");
 
 module.exports = function (injectedStore) {
   let store = injectedStore;
@@ -10,11 +13,16 @@ module.exports = function (injectedStore) {
   }
 
   async function list() {
-    return store.list(TABLE, recordFileModel({}, "find"));
+    return await store.getCustomQuery(
+      listDetailedRecordFiles(recordFileModel(data, "find"))
+    );
   }
 
   async function get(data) {
-    const recordFile = await store.get(TABLE, recordFileModel(data, "find"));
+    // const recordFile = await store.get(TABLE, recordFileModel(data, "find"));
+    const recordFile = await store.getCustomQuery(
+      listDetailedRecordFiles(recordFileModel(data, "find"))
+    );
 
     if (recordFile.length > 0) {
       return recordFile;
@@ -24,6 +32,7 @@ module.exports = function (injectedStore) {
   }
 
   async function insert(data) {
+    console.log("RECORD FILE******************", data);
     const recordFile = await store.get(
       TABLE,
       recordFileModel({ name: data.name, status: "CREATED" }, "find")
