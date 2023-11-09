@@ -5,8 +5,10 @@ const recordFileModel = (data, mode) => {
   let recordFile = {
     name: data.name || "",
     expiration_date: data.expirationDate || "",
+    partner: data.partner || "",
     record_id: data.recordId || "",
     file_type_id: data.fileTypeId || "",
+    file_location: data.fileLocation || "",
   };
 
   switch (mode) {

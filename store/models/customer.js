@@ -3,8 +3,7 @@ const { getCurrentDate } = require("../../utils");
 
 const customerModel = (data, mode) => {
   let customer = {
-    first_name: data.firstName || "",
-    last_name: data.lastName || "",
+    customer_name: data.customerName || "",
     identification_number: data.identificationNumber || "",
     phone_number: data.phoneNumber || "",
     address: data.address || "",

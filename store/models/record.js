@@ -5,6 +5,7 @@ const recordModel = (data, mode) => {
   let record = {
     record_code: data.recordCode || "",
     customer_id: data.customerId || "",
+    number_of_partners: data.numberOfPartners || "",
   };
 
   switch (mode) {

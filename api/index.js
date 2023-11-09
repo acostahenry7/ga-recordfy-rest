@@ -2,6 +2,7 @@ const express = require("express");
 const config = require("../config");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const path = require("path");
 
 //Microservices components
 const auth = require("./components/auth/network");
@@ -29,6 +30,9 @@ app.use("/api/customer-file-type", customerFileType);
 app.use("/api/file-type", fileType);
 app.use("/api/record-file", recordFile);
 app.use("/api/record", record);
+
+//Static Content
+app.use("/static", express.static(path.join(__dirname, "../data")));
 
 app.use(errors);
 
