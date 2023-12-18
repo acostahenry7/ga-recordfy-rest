@@ -3,6 +3,7 @@ const config = require("../config");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const path = require("path");
+const { WebSocketServer } = require("ws");
 
 //Microservices components
 const auth = require("./components/auth/network");
@@ -17,11 +18,31 @@ const errors = require("../network/errors");
 
 const app = express();
 
+var cron = require("node-cron");
+
+const sockserver = new WebSocketServer({ port: 3002 });
+sockserver.on("connection", (ws) => {
+  console.log("New client connected!");
+  // cron.schedule("*/5 * * * * *", () => {
+  //   // console.log("running a task every minute");
+  //   ws.send("connection established bro");
+  // });
+
+  ws.on("close", () => console.log("Client has disconnected!"));
+  ws.on("message", (data) => {
+    sockserver.clients.forEach((client) => {
+      // console.log(`distributing message: ${data}`);
+      client.send(`${data}`);
+    });
+  });
+});
+
 //Middleware
 app.use(bodyParser.json());
 app.use(cors({ origin: "*" }));
 
 //Router
+
 app.use("/api/user", user);
 app.use("/api/auth", auth);
 app.use("/api/customer", customer);
