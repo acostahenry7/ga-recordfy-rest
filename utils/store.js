@@ -43,7 +43,7 @@ function generateWhereConditions(obj, needWhereStatement, isHaving) {
     }
   });
 
-  console.log(whereString);
+  console.log("KING ##########", obj);
 
   if (obj.first_name || obj.last_name) {
     whereString += `AND lower(first_name || ' ' || last_name ) LIKE '%${obj.first_name}%'`;
