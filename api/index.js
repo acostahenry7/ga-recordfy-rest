@@ -3,7 +3,8 @@ const config = require("../config");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const path = require("path");
-const { WebSocketServer } = require("ws");
+const cron = require("node-cron");
+const { db } = require("../store/postgres");
 
 //Microservices components
 const auth = require("./components/auth/network");
@@ -18,23 +19,35 @@ const errors = require("../network/errors");
 
 const app = express();
 
-var cron = require("node-cron");
-
+const { WebSocketServer } = require("ws");
 const sockserver = new WebSocketServer({ port: 3002 });
+
 sockserver.on("connection", (ws) => {
   console.log("New client connected!");
-  // cron.schedule("*/5 * * * * *", () => {
-  //   // console.log("running a task every minute");
-  //   ws.send("connection established bro");
-  // });
+  console.log(new Date().toLocaleString("es-ES", { timeZone: "UTC" }));
+  //0 9 */1 * *
+  let productionCron = "0 9 * * 1-6";
+  let devCron = "*/15 * * * * *";
+  cron.schedule(devCron, async () => {
+    const [notifications] = await db.query(`
+    select rf.record_file_id, rf.name, ft.name as file_type, rf.expiration_date,
+    r.record_code, c.customer_name
+    from record_file rf
+    join file_type ft on (rf.file_type_id = ft.file_type_id)
+    join record r on (rf.record_id = r.record_id)
+    join customer c on (r.customer_id = c.customer_id)
+    WHERE expiration_date::date = CURRENT_DATE`);
+    console.log(notifications);
+    ws.send(JSON.stringify(notifications));
+  });
 
   ws.on("close", () => console.log("Client has disconnected!"));
-  ws.on("message", (data) => {
-    sockserver.clients.forEach((client) => {
-      // console.log(`distributing message: ${data}`);
-      client.send(`${data}`);
-    });
-  });
+  // ws.on("message", (data) => {
+  //   sockserver.clients.forEach((client) => {
+  //     // console.log(`distributing message: ${data}`);
+  //     client.send(`${data}`);
+  //   });
+  // });
 });
 
 //Middleware

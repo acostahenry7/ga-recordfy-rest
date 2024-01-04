@@ -21,9 +21,7 @@ async function list(table, query, options) {
     var { joinTable, joinBy, joinConditions } = options;
   }
 
-  let res = await db.query(`SELECT ${Object.keys(query).map(
-    (i) => `${table}.${i}`
-  )} ${
+  let res = await db.query(`SELECT ${Object.keys(query).map((i) => `${i}`)} ${
     joinConditions
       ? "," +
         Object.keys(joinConditions).map(
@@ -53,10 +51,8 @@ async function get(table, whereConditions, options) {
     if (table !== "auth") {
       whereString += `AND ${table}.status not like 'DELETED'`;
     }
-    let query = `SELECT  ${Object.keys(whereConditions).map(
-      (i) => `${table}.${i}`
-    )} 
-    ${joinTables?.length > 0 ? "," : ""}
+    let query = `SELECT  ${Object.keys(whereConditions).map((i) => `${i}`)} 
+    
     ${
       joinTables?.map((jt) =>
         jt.joinConditions
@@ -205,4 +201,5 @@ module.exports = {
   update,
   remove,
   getCustomQuery,
+  db,
 };

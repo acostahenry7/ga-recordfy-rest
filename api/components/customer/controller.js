@@ -1,5 +1,6 @@
 const TABLE = "customer";
 const { customerModel } = require("../../../store/models/customer");
+const { customerTypeModel } = require("../../../store/models/customerType");
 
 module.exports = function (injectedStore) {
   let store = injectedStore;
@@ -12,7 +13,13 @@ module.exports = function (injectedStore) {
   }
 
   async function get(data) {
-    const customer = await store.get(TABLE, customerModel(data, "find"));
+    const customer = await store.get(
+      TABLE,
+      { ...customerModel(data, "find"), ...customerTypeModel(data, "find") },
+      {
+        joinTables: [{ name: "customer_type", joinBy: "customer_type_id" }],
+      }
+    );
 
     if (customer.length > 0) {
       return customer;

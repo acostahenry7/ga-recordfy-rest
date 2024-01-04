@@ -1,5 +1,6 @@
 const { v4: uuidv4 } = require("uuid");
 const { getCurrentDate } = require("../../utils");
+const { getTableEntries } = require("./helpers");
 
 const customerTypeModel = (data, mode) => {
   let customerType = {
@@ -42,7 +43,7 @@ const customerTypeModel = (data, mode) => {
       break;
   }
 
-  return customerType;
+  return getTableEntries(customerType, "customer_type");
 };
 
 module.exports = { customerTypeModel };

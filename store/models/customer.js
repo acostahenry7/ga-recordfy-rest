@@ -1,5 +1,6 @@
 const { v4: uuidv4 } = require("uuid");
 const { getCurrentDate } = require("../../utils");
+const { getTableEntries } = require("./helpers");
 
 const customerModel = (data, mode) => {
   let customer = {
@@ -8,6 +9,9 @@ const customerModel = (data, mode) => {
     phone_number: data.phoneNumber || "",
     address: data.address || "",
     customer_type_id: data.customerTypeId || "",
+    nationality: data.nationatily || "",
+    identification_type: data.identificationType || "",
+    risk_level: data.riskLevel || "",
   };
 
   switch (mode) {
@@ -45,7 +49,9 @@ const customerModel = (data, mode) => {
     default:
       break;
   }
-
+  if (mode == "find") {
+    return getTableEntries(customer, "customer");
+  }
   return customer;
 };
 
