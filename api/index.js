@@ -4,23 +4,27 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const path = require("path");
 const cron = require("node-cron");
-const { db } = require("../store/postgres");
+const db = require("../store/models");
+//const { db } = require("../store/postgres");
 
 //Microservices components
 const auth = require("./components/auth/network");
-const user = require("./components/user/network");
-const customerType = require("./components/customerType/network");
-const customerFileType = require("./components/customerFileType/network");
+//const user = require("./components/user/network");
 const customer = require("./components/customer/network");
-const fileType = require("./components/fileType/network");
-const recordFile = require("./components/recordFile/network");
-const record = require("./components/record/network");
+// const customerType = require("./components/customerType/network");
+// const customerFileType = require("./components/customerFileType/network");
+// const fileType = require("./components/fileType/network");
+// const recordFile = require("./components/recordFile/network");
+// const record = require("./components/record/network");
 const errors = require("../network/errors");
 
 const app = express();
 
 const { WebSocketServer } = require("ws");
 const sockserver = new WebSocketServer({ port: 3002 });
+process.env.TZ = "America/Santo_Domingo";
+
+console.log(new Date().toISOString());
 
 sockserver.on("connection", (ws) => {
   console.log("New client connected!");
@@ -29,7 +33,7 @@ sockserver.on("connection", (ws) => {
   let productionCron = "0 9 * * 1-6";
   let devCron = "*/15 * * * * *";
   cron.schedule(devCron, async () => {
-    const [notifications] = await db.query(`
+    const [notifications] = await db.sequelize.query(`
     select rf.record_file_id, rf.name, ft.name as file_type, rf.expiration_date,
     r.record_code, c.customer_name
     from record_file rf
@@ -55,15 +59,14 @@ app.use(bodyParser.json());
 app.use(cors({ origin: "*" }));
 
 //Router
-
-app.use("/api/user", user);
 app.use("/api/auth", auth);
+// app.use("/api/user", user);
 app.use("/api/customer", customer);
-app.use("/api/customer-type", customerType);
-app.use("/api/customer-file-type", customerFileType);
-app.use("/api/file-type", fileType);
-app.use("/api/record-file", recordFile);
-app.use("/api/record", record);
+// app.use("/api/customer-type", customerType);
+// app.use("/api/customer-file-type", customerFileType);
+// app.use("/api/file-type", fileType);
+// app.use("/api/record-file", recordFile);
+// app.use("/api/record", record);
 
 //Static Content
 app.use("/static", express.static(path.join(__dirname, "../data")));
@@ -73,3 +76,5 @@ app.use(errors);
 app.listen(config.app.port, () => {
   console.log("Server listening on port " + config.app.port);
 });
+
+db.sequelize.sync();

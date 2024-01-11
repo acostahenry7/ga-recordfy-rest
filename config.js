@@ -6,9 +6,9 @@ module.exports = {
     host: "localhost",
     user: "postgres",
     password: "postgres",
-    db: "garecordfy",
+    dbname: "garecordfy",
     dialect: "postgres",
-    timezone: "-04:00",
+    keepDefaultTimezone: true,
     pool: {
       max: 10,
       min: 0,

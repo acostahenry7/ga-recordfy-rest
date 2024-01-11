@@ -1,50 +1,47 @@
-const { v4: uuidv4 } = require("uuid");
-const { getCurrentDate } = require("../../utils");
+module.exports = (sequelize, Sequelize) => {
+  const Record = sequelize.define(
+    "record",
+    {
+      record_id: {
+        primaryKey: true,
+        type: Sequelize.STRING,
+        defaultValue: Sequelize.UUIDV4,
+        allowNull: false,
+      },
+      record_code: {
+        type: Sequelize.STRING,
+      },
+      customer_id: {
+        type: Sequelize.STRING,
+      },
+      number_of_partners: {
+        type: Sequelize.INTEGER,
+      },
+      status_type: {
+        type: Sequelize.STRING,
+      },
+      created_by: {
+        type: Sequelize.STRING,
+      },
+      last_modified_by: {
+        type: Sequelize.STRING,
+      },
+      created_at: {
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.NOW,
+      },
+      last_modified_at: {
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.NOW,
+      },
+    },
+    {
+      schema: "public",
+      freezeTableName: true,
+      underscored: true,
+      timestamps: false,
+    }
+  );
 
-const recordModel = (data, mode) => {
-  let record = {
-    record_code: data.recordCode || "",
-    customer_id: data.customerId || "",
-    number_of_partners: data.numberOfPartners || "",
-  };
-
-  switch (mode) {
-    case "create":
-      record = {
-        record_id: uuidv4(),
-        ...record,
-        status: "CREATED",
-        modified_by: data.modifiedBy || "",
-        modified_at: getCurrentDate(),
-        created_by: data.createdBy || "",
-        created_at: getCurrentDate(),
-      };
-      break;
-
-    case "update":
-      record = {
-        ...record,
-        status: data.status || "",
-        modified_by: data.modifiedBy || "",
-        modified_at: data.modifiedAt || "",
-      };
-      break;
-    case "find":
-      record = {
-        record_id: data.recordId || "",
-        ...record,
-        status: data.status || "",
-        modified_by: data.modifiedBy || "",
-        modified_at: data.modifiedAt || "",
-        created_by: data.createdBy || "",
-        created_at: data.createdAt || "",
-      };
-      break;
-    default:
-      break;
-  }
-
-  return record;
+  return Record;
 };
-
-module.exports = { recordModel };

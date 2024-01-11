@@ -1,13 +1,15 @@
 const { v4: uuidv4 } = require("uuid");
 const nodemailer = require("nodemailer");
-const TABLE = "auth";
-const verification = require("../../../template/email/verification");
-const { authModel } = require("../../../store/models/auth");
-const { userProfileModel } = require("../../../store/models/user");
+const verificationTemplate = require("../../../template/email/verification");
 const bcrypt = require("bcryptjs");
 const error = require("../../../utils/error");
+const db = require("../../../store/models/index");
 
-const auth = require("../../../auth");
+//Sequelize Models
+const Auth = db.auth;
+const UserProfile = db.userProfile;
+
+const authMiddleware = require("../../../auth");
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -17,160 +19,152 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-module.exports = function (injectedStore) {
-  let store = injectedStore;
-  if (!store) {
-    store = require("../../../store/dummy");
-  }
+async function signup(data) {
+  return Auth.findAll({
+    where: {
+      username: data.username,
+    },
+  }).then((authExists) => {
+    if (authExists.length > 0) {
+      throw error("User already exists", 401);
+    }
 
-  async function signup(data) {
-    let userProfile = await store.get(
-      TABLE,
-      authModel({ username: data.username })
-    );
+    const verificationToken = uuidv4();
 
-    if (userProfile.length > 0) {
-      return new Promise((resolve, reject) =>
-        reject(new Error("User already exists!"))
-      );
-    } else {
-      const verificationToken = uuidv4();
-
-      userProfile = await store.insert(
-        "user_profile",
-        userProfileModel(data, "create")
-      );
-
+    return UserProfile.create({
+      first_name: data.firstName,
+      last_name: data.lastName,
+      email: data.email,
+      phone_number: data.phoneNumber,
+      status_type: "CREATED",
+      created_by: data.createdBy,
+      last_modified_by: data.lastModifiedBy,
+    }).then((userProfile) => {
       console.log(userProfile);
-
-      store.insert(
-        TABLE,
-        authModel(
-          {
-            ...data,
-            verificationToken,
-            userProfileId: userProfile.user_profile_id,
-          },
-          true
-        )
-      );
-
-      let queryParams = "";
-      let verificationParams = {
+      return Auth.create({
         username: data.username,
-        verificationToken,
-      };
+        password: bcrypt.hashSync(data.password, 8),
+        user_profile_id: userProfile.dataValues.user_profile_id,
+        verified: false,
+        verification_token: verificationToken,
+      }).then((auth) => {
+        let queryParams = "";
+        let verificationParams = {
+          username: data.username,
+          verificationToken,
+        };
 
-      for (entry of Object.entries(verificationParams)) {
-        key = entry[0];
-        value = entry[1];
-        queryParams += `${key}=${value}&`;
-      }
-
-      const mailOptions = {
-        from: "GaRecordfy <grupoavant.tablet@gmail.com>",
-        to: data.email,
-        subject: "Confirmación de Creación de Cuenta GaRecordfy",
-        html: verification({ ...data, queryParams }),
-      };
-
-      transporter.sendMail(mailOptions, function (error, info) {
-        if (error) {
-          throw new Error(error);
-        } else {
-          console.log(info);
+        for (entry of Object.entries(verificationParams)) {
+          key = entry[0];
+          value = entry[1];
+          queryParams += `${key}=${value}&`;
         }
+
+        const mailOptions = {
+          from: "GaRecordfy <grupoavant.tablet@gmail.com>",
+          to: data.email,
+          subject: "Confirmación de Creación de Cuenta GaRecordfy",
+          html: verificationTemplate({ ...data, queryParams }),
+        };
+
+        transporter.sendMail(mailOptions, function (error, info) {
+          if (error) {
+            throw new Error(error);
+          } else {
+            console.log(info);
+          }
+        });
+
+        return userProfile.dataValues;
       });
+    });
+  });
+}
 
-      return store.get(
-        "user_profile",
-        userProfileModel({ userProfileId: userProfile.user_profile_id }, "find")
-      );
-    }
-  }
+async function signin(data) {
+  return Auth.findOne({
+    where: {
+      username: data.username,
+    },
+  })
+    .then((auth) => {
+      if (auth) {
+        if (auth.dataValues.verified === true) {
+          return UserProfile.findOne({
+            where: {
+              user_profile_id: auth.dataValues.user_profile_id,
+            },
+          }).then((user) => {
+            return bcrypt
+              .compare(data.password, auth.dataValues.password)
+              .then((res) => {
+                const accessToken = authMiddleware.sign(auth.dataValues);
+                let authResponse = {
+                  token: accessToken,
+                  username: auth.dataValues.username,
+                  userProfile: user.dataValues,
+                };
 
-  async function signin(data) {
-    const authProfile = await store.get(
-      TABLE,
-      authModel({ username: data.username })
-    );
-
-    if (authProfile.length > 0) {
-      const [userProfile] = await store.get(
-        "user_profile",
-        userProfileModel(
-          {
-            userProfileId: authProfile[0].user_profile_id,
-          },
-          "find"
-        )
-      );
-
-      if (authProfile[0].verified === true) {
-        return bcrypt
-          .compare(data.password, authProfile[0].password)
-          .then((res) => {
-            const accessToken = auth.sign(authProfile[0]);
-            let authResponse = {
-              token: accessToken,
-              username: authProfile[0].username,
-              userProfile,
-            };
-
-            if (res === true) {
-              return authResponse;
-            } else {
-              throw new Error("Invalid username or password!");
-            }
-          })
-          .catch((err) => {
-            throw new Error(err.message);
+                if (res === true) {
+                  return authResponse;
+                } else {
+                  throw new Error("Invalid username or password!");
+                }
+              })
+              .catch((err) => {
+                throw new Error(err.message);
+              });
           });
+        } else {
+          throw error("Not authorized! Missing verification", 401);
+        }
       } else {
-        throw error("Not authorized! Missing verification", 401);
+        throw error("Invalid username or password!");
       }
-    } else {
-      throw new Error("Invalid username or password!");
-    }
-  }
+    })
+    .catch((err) => {
+      throw error(err.message);
+    });
+}
 
-  async function signout() {
-    return {
-      token: "",
-    };
-  }
-
-  async function verify(params) {
-    const authProfile = await store.get(
-      TABLE,
-      authModel({ username: params.username })
-    );
-
-    console.log(authProfile);
-
-    if (authProfile.length > 0) {
-      if (authProfile[0].verification_token === params.verificationToken) {
-        await store.update(
-          TABLE,
-          authProfile[0].auth_id,
-          authModel({
-            verified: true,
-          })
-        );
-
-        return;
-      } else {
-        throw error("Bad verification token", 400);
-      }
-    }
-  }
-
-  // if ()
-
+async function signout() {
   return {
-    signup,
-    signin,
-    signout,
-    verify,
+    token: "",
   };
+}
+
+async function verify(params) {
+  return Auth.findAll({
+    where: {
+      username: params.username,
+    },
+  })
+    .then((auth) => {
+      if (auth.length > 0) {
+        if (
+          auth[0].dataValues.verification_token === params.verificationToken
+        ) {
+          return Auth.update(
+            {
+              verified: true,
+            },
+            { where: { username: params.username } }
+          ).then(() => {
+            console.log("NO PUEDE SER ", auth);
+            return;
+          });
+        }
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+      throw error(err.message);
+    });
+}
+
+module.exports = {
+  signup,
+  signin,
+  signout,
+  verify,
 };

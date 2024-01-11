@@ -1,18 +1,24 @@
 module.exports = (sequelize, Sequelize) => {
-  const FileType = sequelize.define(
-    "file_type",
+  const UserProfile = sequelize.define(
+    "user_profile",
     {
-      file_type_id: {
+      user_profile_id: {
         primaryKey: true,
         type: Sequelize.STRING,
         defaultValue: Sequelize.UUIDV4,
         allowNull: false,
       },
-      name: {
-        type: Sequelize.INTEGER,
+      first_name: {
+        type: Sequelize.STRING,
       },
-      prefix: {
-        type: Sequelize.INTEGER,
+      last_name: {
+        type: Sequelize.STRING,
+      },
+      email: {
+        type: Sequelize.STRING,
+      },
+      phone_number: {
+        type: Sequelize.STRING,
       },
       status_type: {
         type: Sequelize.STRING,
@@ -40,5 +46,5 @@ module.exports = (sequelize, Sequelize) => {
     }
   );
 
-  return FileType;
+  return UserProfile;
 };

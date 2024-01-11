@@ -39,7 +39,7 @@ let upload = multer({ storage });
 
 // router.post("/update", upload.single("file"), update);
 router.post("/upload", upload.single("file"), (req, res) => {
-  // console.log(req);
+  console.log(req.body);
 
   controller
     .insert(req.body)

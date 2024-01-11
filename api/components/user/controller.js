@@ -1,6 +1,6 @@
 const TABLE = "user_profile";
 const { v4: uuidv4 } = require("uuid");
-const { userProfileModel } = require("../../../store/models/user");
+//const { userProfileModel } = require("../../../store/models/user");
 const error = require("../../../utils/error");
 
 module.exports = function (injectedStore) {

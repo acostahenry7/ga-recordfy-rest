@@ -1,35 +1,39 @@
 module.exports = (sequelize, Sequelize) => {
-  const FileType = sequelize.define(
-    "file_type",
+  const Beneficiary = sequelize.define(
+    "beneficiary",
     {
-      file_type_id: {
+      beneficiary_id: {
         primaryKey: true,
         type: Sequelize.STRING,
         defaultValue: Sequelize.UUIDV4,
         allowNull: false,
       },
+      record_id: {
+        type: Sequelize.INTEGER,
+      },
+      order: {
+        type: Sequelize.INTEGER,
+      },
       name: {
-        type: Sequelize.INTEGER,
-      },
-      prefix: {
-        type: Sequelize.INTEGER,
-      },
-      status_type: {
         type: Sequelize.STRING,
       },
-      created_by: {
+      identification_number: {
         type: Sequelize.STRING,
       },
-      last_modified_by: {
+      nationality: {
         type: Sequelize.STRING,
       },
-      created_at: {
-        type: Sequelize.DATE,
-        defaultValue: Sequelize.NOW,
+      stocks_percentage: {
+        type: Sequelize.STRING,
       },
-      last_modified_at: {
-        type: Sequelize.DATE,
-        defaultValue: Sequelize.NOW,
+      is_pep: {
+        type: Sequelize.BOOLEAN,
+      },
+      is_politician: {
+        type: Sequelize.BOOLEAN,
+      },
+      is_politician_relative: {
+        type: Sequelize.BOOLEAN,
       },
     },
     {
@@ -40,5 +44,5 @@ module.exports = (sequelize, Sequelize) => {
     }
   );
 
-  return FileType;
+  return Beneficiary;
 };

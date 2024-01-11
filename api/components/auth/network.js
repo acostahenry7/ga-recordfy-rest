@@ -42,7 +42,7 @@ router.post(
 );
 
 router.get("/verify", (req, res) => {
-  console.log("token", req.query);
+  //console.log("token", req.query);
   controller
     .verify(req.query)
     .then((msg) => {

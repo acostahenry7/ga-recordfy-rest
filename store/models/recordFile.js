@@ -1,53 +1,50 @@
-const { v4: uuidv4 } = require("uuid");
-const { getCurrentDate } = require("../../utils");
+module.exports = (sequelize, Sequelize) => {
+  const RecordFile = sequelize.define(
+    "record_file",
+    {
+      record_file_id: {
+        primaryKey: true,
+        type: Sequelize.STRING,
+        defaultValue: Sequelize.UUIDV4,
+        allowNull: false,
+      },
+      name: {
+        type: Sequelize.STRING,
+      },
+      record_id: {
+        type: Sequelize.STRING,
+      },
+      file_type_id: {
+        type: Sequelize.STRING,
+      },
+      expiration_date: {
+        type: Sequelize.STRING,
+      },
+      status_type: {
+        type: Sequelize.STRING,
+      },
+      created_by: {
+        type: Sequelize.STRING,
+      },
+      last_modified_by: {
+        type: Sequelize.STRING,
+      },
+      created_at: {
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.NOW,
+      },
+      last_modified_at: {
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.NOW,
+      },
+    },
+    {
+      schema: "public",
+      freezeTableName: true,
+      underscored: true,
+      timestamps: false,
+    }
+  );
 
-const recordFileModel = (data, mode) => {
-  let recordFile = {
-    name: data.name || "",
-    expiration_date: data.expirationDate || "",
-    partner: data.partner || "",
-    record_id: data.recordId || "",
-    file_type_id: data.fileTypeId || "",
-    file_location: data.fileLocation || "",
-  };
-
-  switch (mode) {
-    case "create":
-      recordFile = {
-        record_file_id: uuidv4(),
-        ...recordFile,
-        status: "CREATED",
-        modified_by: data.modifiedBy || "",
-        modified_at: getCurrentDate(),
-        created_by: data.createdBy || "",
-        created_at: getCurrentDate(),
-      };
-      break;
-
-    case "update":
-      recordFile = {
-        ...recordFile,
-        status: data.status || "",
-        modified_by: data.modifiedBy || "",
-        modified_at: data.modifiedAt || "",
-      };
-      break;
-    case "find":
-      recordFile = {
-        record_file_id: data.recordFileId || "",
-        ...recordFile,
-        status: data.status || "",
-        modified_by: data.modifiedBy || "",
-        modified_at: data.modifiedAt || "",
-        created_by: data.createdBy || "",
-        created_at: data.createdAt || "",
-      };
-      break;
-    default:
-      break;
-  }
-
-  return recordFile;
+  return RecordFile;
 };
-
-module.exports = { recordFileModel };

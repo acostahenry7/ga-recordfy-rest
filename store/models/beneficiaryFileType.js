@@ -1,26 +1,20 @@
 module.exports = (sequelize, Sequelize) => {
-  const Auth = sequelize.define(
-    "auth",
+  const BeneficiaryFileType = sequelize.define(
+    "beneficiary_type_file",
     {
-      auth_id: {
+      beneficiary_type_file_id: {
         primaryKey: true,
         type: Sequelize.STRING,
         defaultValue: Sequelize.UUIDV4,
         allowNull: false,
       },
-      username: {
+      file_type_id: {
         type: Sequelize.STRING,
       },
-      password: {
+      benficiary_type: {
         type: Sequelize.STRING,
       },
-      user_profile_id: {
-        type: Sequelize.STRING,
-      },
-      verified: {
-        type: Sequelize.BOOLEAN,
-      },
-      verification_token: {
+      status_type: {
         type: Sequelize.STRING,
       },
     },
@@ -32,5 +26,5 @@ module.exports = (sequelize, Sequelize) => {
     }
   );
 
-  return Auth;
+  return BeneficiaryFileType;
 };
