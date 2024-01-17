@@ -14,7 +14,7 @@ module.exports = (sequelize, Sequelize) => {
       customer_id: {
         type: Sequelize.STRING,
       },
-      number_of_partners: {
+      number_of_beneficiaries: {
         type: Sequelize.INTEGER,
       },
       status_type: {

@@ -9,12 +9,18 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false,
       },
       record_id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING,
       },
       order: {
         type: Sequelize.INTEGER,
       },
+      beneficiary_type: {
+        type: Sequelize.STRING,
+      },
       name: {
+        type: Sequelize.STRING,
+      },
+      identification_type: {
         type: Sequelize.STRING,
       },
       identification_number: {

@@ -39,6 +39,14 @@ db.fileType = require("../models/fileType")(sequelize, Sequelize);
 db.record = require("../models/record")(sequelize, Sequelize);
 db.recordFile = require("../models/recordFile")(sequelize, Sequelize);
 
+db.record.hasOne(db.recordFile, {
+  foreignKey: "record_id",
+});
+
+db.recordFile.belongsTo(db.record, {
+  foreignKey: "record_id",
+});
+
 // db.payment.hasOne(db.receipt, {
 //   foreignKey: "payment_id",
 // });

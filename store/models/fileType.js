@@ -9,10 +9,10 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false,
       },
       name: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING,
       },
       prefix: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING,
       },
       status_type: {
         type: Sequelize.STRING,

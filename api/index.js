@@ -13,9 +13,9 @@ const auth = require("./components/auth/network");
 const customer = require("./components/customer/network");
 // const customerType = require("./components/customerType/network");
 // const customerFileType = require("./components/customerFileType/network");
-// const fileType = require("./components/fileType/network");
+const fileType = require("./components/fileType/network");
 // const recordFile = require("./components/recordFile/network");
-// const record = require("./components/record/network");
+const record = require("./components/record/network");
 const errors = require("../network/errors");
 
 const app = express();
@@ -64,9 +64,9 @@ app.use("/api/auth", auth);
 app.use("/api/customer", customer);
 // app.use("/api/customer-type", customerType);
 // app.use("/api/customer-file-type", customerFileType);
-// app.use("/api/file-type", fileType);
+app.use("/api/file-type", fileType);
 // app.use("/api/record-file", recordFile);
-// app.use("/api/record", record);
+app.use("/api/record", record);
 
 //Static Content
 app.use("/static", express.static(path.join(__dirname, "../data")));

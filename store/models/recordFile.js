@@ -18,7 +18,7 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING,
       },
       expiration_date: {
-        type: Sequelize.STRING,
+        type: Sequelize.DATE,
       },
       status_type: {
         type: Sequelize.STRING,
