@@ -39,12 +39,42 @@ db.fileType = require("../models/fileType")(sequelize, Sequelize);
 db.record = require("../models/record")(sequelize, Sequelize);
 db.recordFile = require("../models/recordFile")(sequelize, Sequelize);
 
-db.record.hasOne(db.recordFile, {
+//Asociations
+
+//Customer - Record
+db.customer.hasOne(db.record, {
+  foreignKey: "customer_id",
+});
+
+db.record.belongsTo(db.customer, {
+  foreignKey: "customer_id",
+});
+
+//Record - Beneficiary
+db.record.hasMany(db.beneficiary, {
   foreignKey: "record_id",
 });
 
-db.recordFile.belongsTo(db.record, {
+db.beneficiary.belongsTo(db.record, {
   foreignKey: "record_id",
+});
+
+//Beneficiary - Record file
+db.beneficiary.hasMany(db.recordFile, {
+  foreignKey: "beneficiary_id",
+});
+
+db.recordFile.belongsTo(db.beneficiary, {
+  foreignKey: "beneficiary_id",
+});
+
+//BeneficiaryFileType - Filetype
+db.beneficiaryFileType.belongsTo(db.fileType, {
+  foreignKey: "file_type_id",
+});
+
+db.fileType.hasMany(db.beneficiaryFileType, {
+  foreignKey: "file_type_id",
 });
 
 // db.payment.hasOne(db.receipt, {

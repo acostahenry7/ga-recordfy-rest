@@ -11,7 +11,7 @@ module.exports = (sequelize, Sequelize) => {
       file_type_id: {
         type: Sequelize.STRING,
       },
-      benficiary_type: {
+      beneficiary_type: {
         type: Sequelize.STRING,
       },
       status_type: {

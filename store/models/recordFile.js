@@ -11,7 +11,7 @@ module.exports = (sequelize, Sequelize) => {
       name: {
         type: Sequelize.STRING,
       },
-      record_id: {
+      beneficiary_id: {
         type: Sequelize.STRING,
       },
       file_type_id: {
