@@ -14,7 +14,7 @@ const customer = require("./components/customer/network");
 // const customerType = require("./components/customerType/network");
 const beneficiaryTypeFile = require("./components/beneficiaryTypeFile/network");
 const fileType = require("./components/fileType/network");
-// const recordFile = require("./components/recordFile/network");
+const recordFile = require("./components/recordFile/network");
 const record = require("./components/record/network");
 const errors = require("../network/errors");
 
@@ -28,19 +28,21 @@ console.log(new Date().toISOString());
 
 sockserver.on("connection", (ws) => {
   console.log("New client connected!");
-  console.log(new Date().toLocaleString("es-ES", { timeZone: "UTC" }));
+  console.log(new Date().toLocaleString("do-ES", { timeZone: "UTC" }));
   //0 9 */1 * *
-  let productionCron = "0 9 * * 1-6";
-  let devCron = "*/15 * * * * *";
+  let productionCron = "30 8,13,16 * * 0-6";
+  let devCron = "*/60 * * * * *";
   cron.schedule(devCron, async () => {
     const [notifications] = await db.sequelize.query(`
     select rf.record_file_id, rf.name, ft.name as file_type, rf.expiration_date,
-    r.record_code, c.customer_name
+    r.record_id, c.customer_name
     from record_file rf
     join file_type ft on (rf.file_type_id = ft.file_type_id)
-    join record r on (rf.record_id = r.record_id)
+    join beneficiary b on (rf.beneficiary_id = b.beneficiary_id)
+	  join record r on (b.record_id = r.record_id)
     join customer c on (r.customer_id = c.customer_id)
-    WHERE expiration_date::date = CURRENT_DATE`);
+    WHERE expiration_date::date = CURRENT_DATE
+    AND rf.status_type <> 'DELETED'`);
     console.log(notifications);
     ws.send(JSON.stringify(notifications));
   });
@@ -65,7 +67,7 @@ app.use("/api/customer", customer);
 // app.use("/api/customer-type", customerType);
 app.use("/api/beneficiary-type-file", beneficiaryTypeFile);
 app.use("/api/file-type", fileType);
-// app.use("/api/record-file", recordFile);
+app.use("/api/record-file", recordFile);
 app.use("/api/record", record);
 
 //Static Content

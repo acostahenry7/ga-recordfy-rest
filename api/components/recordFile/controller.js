@@ -6,6 +6,10 @@ const {
   listDetailedRecordFiles,
 } = require("../../../store/queries/recordFile");
 
+const db = require("../../../store/models");
+const error = require("../../../utils/error");
+const RecordFile = db.recordFile;
+
 module.exports = function (injectedStore) {
   let store = injectedStore;
   if (!store) {
@@ -32,34 +36,51 @@ module.exports = function (injectedStore) {
   }
 
   async function insert(data) {
-    console.log("RECORD FILE******************", data);
-    const recordFile = await store.get(
-      TABLE,
-      recordFileModel({ name: data.name, status: "CREATED" }, "find")
-    );
+    RecordFile.create({
+      name: data.name,
+      beneficiary_id: data.beneficiaryId,
+      file_type_id: data.fileTypeId,
+      source: data.fileLocation,
+      expiration_date: data.expirationDate,
+      status_type: "CREATED",
+      created_by: data.createdBy,
+      last_modified_by: data.lastModifiedBy,
+    })
+      .then((recordFile) => {
+        return recordFile;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
 
-    if (recordFile.length > 0 && recordFile[0].record_id === data.recordId) {
-      throw new Error("recordFile already exists!");
-    } else {
-      const targetRecord = await store.get(
-        "record",
-        recordModel({ recordId: data.recordId }, "find")
-      );
-      const targetFileType = await store.get(
-        "file_type",
-        fileTypeModel({ fileTypeId: data.fileTypeId }, "find")
-      );
+    // console.log("RECORD FILE******************", data);
+    // const recordFile = await store.get(
+    //   TABLE,
+    //   recordFileModel({ name: data.name, status: "CREATED" }, "find")
+    // );
 
-      if (targetRecord === undefined || targetRecord.length === 0) {
-        throw new Error("Invalid record");
-      }
+    // if (recordFile.length > 0 && recordFile[0].record_id === data.recordId) {
+    //   throw new Error("recordFile already exists!");
+    // } else {
+    //   const targetRecord = await store.get(
+    //     "record",
+    //     recordModel({ recordId: data.recordId }, "find")
+    //   );
+    //   const targetFileType = await store.get(
+    //     "file_type",
+    //     fileTypeModel({ fileTypeId: data.fileTypeId }, "find")
+    //   );
 
-      if (targetFileType === undefined || targetFileType.length === 0) {
-        throw new Error("Invalid fileType");
-      }
+    //   if (targetRecord === undefined || targetRecord.length === 0) {
+    //     throw new Error("Invalid record");
+    //   }
 
-      return store.insert(TABLE, recordFileModel(data, "create"));
-    }
+    //   if (targetFileType === undefined || targetFileType.length === 0) {
+    //     throw new Error("Invalid fileType");
+    //   }
+
+    //   return store.insert(TABLE, recordFileModel(data, "create"));
+    // }
   }
 
   async function update(id, data) {
@@ -76,12 +97,32 @@ module.exports = function (injectedStore) {
     }
   }
 
-  //async function
+  async function remove(id) {
+    RecordFile.update(
+      {
+        status_type: "DELETED",
+      },
+      {
+        where: {
+          record_file_id: id,
+        },
+      }
+    )
+      .then((recordFile) => {
+        console.log(recordFile);
+        return recordFile;
+      })
+      .catch((err) => {
+        console.log(err);
+        error(err);
+      });
+  }
 
   return {
     list,
     get,
     insert,
     update,
+    remove,
   };
 };
