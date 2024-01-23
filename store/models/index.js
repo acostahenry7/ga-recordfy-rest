@@ -11,7 +11,11 @@ const sequelize = new Sequelize(
     host: config.db.host,
     dialect: config.db.dialect,
     operatorsAliases: false,
-    timezone: "-04:00",
+    // dialectOptions: {
+    //   useUTC: false,
+    // },
+    // timezone: "+04:00",
+
     pool: {
       max: config.db.pool.max,
       min: config.db.pool.min,
@@ -74,6 +78,15 @@ db.beneficiaryFileType.belongsTo(db.fileType, {
 });
 
 db.fileType.hasMany(db.beneficiaryFileType, {
+  foreignKey: "file_type_id",
+});
+
+//RecordFile - FileType
+db.recordFile.belongsTo(db.fileType, {
+  foreignKey: "file_type_id",
+});
+
+db.fileType.hasMany(db.recordFile, {
   foreignKey: "file_type_id",
 });
 

@@ -17,6 +17,9 @@ module.exports = (sequelize, Sequelize) => {
       file_type_id: {
         type: Sequelize.STRING,
       },
+      source: {
+        type: Sequelize.STRING,
+      },
       expiration_date: {
         type: Sequelize.DATE,
       },

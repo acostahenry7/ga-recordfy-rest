@@ -12,7 +12,7 @@ const storage = multer.diskStorage({
     console.log("NO PUEDE SER ###############################", req.body);
     const route = path.join(
       __dirname,
-      `../../../data/${req.body.identification}`
+      `../../../data/${req.body.beneficiaryId}`
     );
     fs.mkdirSync(route, { recursive: true });
     cb(null, route);
@@ -28,7 +28,7 @@ const storage = multer.diskStorage({
 
     req.body = {
       ...req.body,
-      fileLocation: `http://${req.hostname}:${req.socket.localPort}/static/${req.body.identification}/${filename}`,
+      fileLocation: `http://${req.hostname}:${req.socket.localPort}/static/${req.body.beneficiaryId}/${filename}`,
     };
 
     cb(null, filename);
@@ -95,8 +95,37 @@ router.put("/:id", verifyToken, (req, res) => {
     });
 });
 
-// router.delete("/:id", (req, res) => {
-//     c
-// })
+router.delete("/", (req, res) => {
+  let location = req.query.fileLocation;
+
+  let dirName = location.slice(
+    location.lastIndexOf("/") - 36,
+    location.lastIndexOf("/")
+  );
+  let fileName = location.slice(location.lastIndexOf("/") + 1, location.length);
+
+  console.log(dirName);
+  fs.unlink(
+    path.join(__dirname, `../../../data/${dirName}/${fileName}`),
+    (err) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log("borrado");
+      }
+    }
+  );
+
+  console.log(req.query.recordFileId);
+
+  controller
+    .remove(req.query.recordFileId)
+    .then((msg) => {
+      response.success(req, res, msg, 200);
+    })
+    .catch((err) => {
+      response.error(req, res, err.message, err.statusCode);
+    });
+});
 
 module.exports = router;

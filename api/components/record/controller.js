@@ -3,22 +3,132 @@ const Customer = db.customer;
 const Record = db.record;
 const RecordFile = db.recordFile;
 const Beneficiary = db.beneficiary;
+const BeneficiaryFileType = db.beneficiaryFileType;
+const FileType = db.fileType;
+const Op = db.op;
+const sequelize = db.sequelize;
 const error = require("../../../network/errors");
 
 module.exports = function (injectedStore) {
   async function get(data) {
+    let [...beneficiaryFileType] = await BeneficiaryFileType.findAll();
+    beneficiaryFileType = beneficiaryFileType.map((item) => item.dataValues);
+
+    console.log(data);
+
+    const getFileAmount = (
+      beneficiaryType,
+      { isPep, isPolitician, isPoliticianRelative } = {}
+    ) => {
+      return beneficiaryFileType.filter((item) => {
+        if (
+          item.beneficiary_type == beneficiaryType ||
+          (isPep == true &&
+            item.beneficiary_type == `${beneficiaryType}_PEP`) ||
+          (isPolitician == true &&
+            item.beneficiary_type == `${beneficiaryType}_POLITICIAN`) ||
+          (isPoliticianRelative == true &&
+            item.beneficiary_type == `${beneficiaryType}_POLITICIAN_RELATIVE`)
+        ) {
+          return true;
+        }
+      }).length;
+    };
+
     return Record.findAll({
+      where: {
+        record_id: {
+          [Op.like]: `%${data.recordId || ""}%`,
+        },
+      },
       include: [
         {
           model: Customer,
+          where: {
+            [Op.and]: [
+              sequelize.where(
+                sequelize.fn("lower", sequelize.col("customer_name")),
+                {
+                  [Op.like]: `%${data.customerName?.toLowerCase() || ""}%`,
+                }
+              ),
+              {
+                [Op.and]: [
+                  {
+                    identification_number: {
+                      [Op.like]: `%${data.identificationNumber || ""}%`,
+                    },
+                  },
+                ],
+              },
+              {
+                [Op.and]: [
+                  {
+                    identification_number: {
+                      [Op.like]: `%${
+                        data.identificationNumber?.toLowerCase() || ""
+                      }%`,
+                    },
+                  },
+                ],
+              },
+              {
+                [Op.and]: [
+                  {
+                    phone_number: {
+                      [Op.like]: `%${data.phoneNumber?.toLowerCase() || ""}%`,
+                    },
+                  },
+                ],
+              },
+            ],
+          },
         },
         {
           model: Beneficiary,
-          include: [RecordFile],
+          include: [
+            {
+              model: RecordFile,
+              required: false,
+              where: {
+                status_type: {
+                  [Op.not]: "DELETED",
+                },
+              },
+
+              include: [FileType],
+            },
+          ],
         },
       ],
+      order: [[Beneficiary, RecordFile, "created_at", "DESC"]],
     })
       .then((record) => {
+        let response = [];
+        for (let i = 0; i < record.length; i++) {
+          // console.log(record[i].dataValues);
+          for (let j = 0; j < record[i].dataValues.beneficiaries.length; j++) {
+            record[i].beneficiaries[j].dataValues.required_files =
+              getFileAmount(
+                record[i].beneficiaries[j].dataValues.beneficiary_type,
+                {
+                  isPep: record[i].beneficiaries[j].dataValues.is_pep,
+                  isPolitician:
+                    record[i].beneficiaries[j].dataValues.is_politician,
+                  isPoliticianRelative:
+                    record[i].beneficiaries[j].dataValues
+                      .is_politician_relative,
+                }
+              );
+          }
+        }
+
+        // let response = record.map((item) => {
+        //     return {
+        //       ...item,
+        //       file_amount: getFileAmount(item.beneficiary_type)
+        //     }
+        // })
         return record;
       })
       .catch((err) => {
