@@ -2,6 +2,7 @@ const db = require("../../../store/models");
 
 //Sequelize Models
 const Customer = db.customer;
+const Record = db.record;
 const Op = db.op;
 const sequelize = db.sequelize;
 
@@ -69,6 +70,11 @@ module.exports = function (injectedStore) {
             },
           ],
         },
+        include: [
+          {
+            model: Record,
+          },
+        ],
       });
     } catch (error) {
       console.log(error);

@@ -95,11 +95,13 @@ module.exports = function (injectedStore) {
                   [Op.not]: "DELETED",
                 },
               },
+
               include: [FileType],
             },
           ],
         },
       ],
+      order: [[Beneficiary, RecordFile, "created_at", "DESC"]],
     })
       .then((record) => {
         let response = [];
