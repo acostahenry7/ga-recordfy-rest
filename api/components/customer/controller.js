@@ -123,6 +123,7 @@ module.exports = function (injectedStore) {
         is_politician_relative: data.isPoliticianRelative,
         created_by: data.createdBy,
         last_modified_by: data.lastModifiedBy,
+        risk_level: data.riskLevel,
       }).then((createdCustomer) => {
         return createdCustomer.dataValues;
       });
@@ -157,6 +158,7 @@ module.exports = function (injectedStore) {
         company_private_pct: data.companyPrivatePct,
         company_public_pct: data.companyPublicPct,
         is_pep: data.isPep,
+        risk_level: data.riskLevel,
         is_politician: data.isPolitician,
         is_politician_relative: data.isPoliticianRelative,
         created_by: data.createdBy,

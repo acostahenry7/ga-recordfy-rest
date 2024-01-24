@@ -10,8 +10,6 @@ function getCurrentDate() {
   return `${d.getFullYear()}-${month}-${day}T${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}.${d.getMilliseconds()}Z`;
 }
 
-console.log(getCurrentDate());
-
 module.exports = {
   getCurrentDate,
 };

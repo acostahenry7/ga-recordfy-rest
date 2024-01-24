@@ -21,18 +21,15 @@ const errors = require("../network/errors");
 const app = express();
 
 const { WebSocketServer } = require("ws");
-const sockserver = new WebSocketServer({ port: 3002 });
+const sockserver = new WebSocketServer({ port: config.app.wsport });
 process.env.TZ = "America/Santo_Domingo";
-
-console.log(new Date().toISOString());
 
 sockserver.on("connection", (ws) => {
   console.log("New client connected!");
-  console.log(new Date().toLocaleString("do-ES", { timeZone: "UTC" }));
   //0 9 */1 * *
   let productionCron = "30 8,13,16 * * 0-6";
   let devCron = "*/60 * * * * *";
-  cron.schedule(devCron, async () => {
+  cron.schedule(productionCron, async () => {
     const [notifications] = await db.sequelize.query(`
     select rf.record_file_id, rf.name, ft.name as file_type, rf.expiration_date,
     r.record_id, c.customer_name

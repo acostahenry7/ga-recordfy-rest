@@ -84,6 +84,9 @@ module.exports = (sequelize, Sequelize) => {
       company_economic_sector: {
         type: Sequelize.STRING,
       },
+      risk_level: {
+        type: Sequelize.STRING,
+      },
       is_pep: {
         type: Sequelize.BOOLEAN,
       },

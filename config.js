@@ -1,6 +1,10 @@
 module.exports = {
   app: {
-    port: process.env.RECORDFY_PORT || 3001,
+    port: process.env.GARECORDFY_PORT || 3001,
+    wsport: process.env.GARECORDFY_WS_PORT || 3002,
+    storage: {
+      port: 19605,
+    },
   },
   db: {
     host: "localhost",

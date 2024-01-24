@@ -6,6 +6,7 @@ const controller = require("./index");
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
+const config = require("../../../config");
 
 const storage = multer.diskStorage({
   destination(req, res, cb) {
@@ -28,7 +29,11 @@ const storage = multer.diskStorage({
 
     req.body = {
       ...req.body,
-      fileLocation: `http://${req.hostname}:${req.socket.localPort}/static/${req.body.beneficiaryId}/${filename}`,
+      fileLocation: `http://${req.hostname}:${
+        req.socket.localPort == 6005
+          ? config.app.storage.port
+          : req.socket.localPort
+      }/static/${req.body.beneficiaryId}/${filename}`,
     };
 
     cb(null, filename);
