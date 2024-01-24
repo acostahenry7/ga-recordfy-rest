@@ -100,7 +100,7 @@ module.exports = (params) => {
           de más abajo ↓</b
         >
       </p>
-      <a href="https://op.grupoavant.com.do:19605/api/auth/verify?${params.queryParams}" rel="nofollow" target="blank">Verificar mi cuenta</a>
+      <a href="http://op.grupoavant.com.do:19605/api/auth/verify?${params.queryParams}" rel="nofollow" target="blank">Verificar mi cuenta</a>
     </div>
   </body>
 </html>
