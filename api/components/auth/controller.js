@@ -63,7 +63,7 @@ async function signup(data) {
 
         const mailOptions = {
           from: "GaRecordfy <grupoavant.tablet@gmail.com>",
-          to: config.app.verficationEmails,
+          to: data.email, //config.app.verficationEmails,
           subject: "Confirmación de Creación de Cuenta GaRecordfy",
           html: verificationTemplate({ ...data, queryParams }),
         };
