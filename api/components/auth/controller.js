@@ -4,6 +4,7 @@ const verificationTemplate = require("../../../template/email/verification");
 const bcrypt = require("bcryptjs");
 const error = require("../../../utils/error");
 const db = require("../../../store/models/index");
+const config = require("../../../config");
 
 //Sequelize Models
 const Auth = db.auth;
@@ -62,7 +63,7 @@ async function signup(data) {
 
         const mailOptions = {
           from: "GaRecordfy <grupoavant.tablet@gmail.com>",
-          to: data.email,
+          to: config.app.verficationEmails,
           subject: "Confirmación de Creación de Cuenta GaRecordfy",
           html: verificationTemplate({ ...data, queryParams }),
         };

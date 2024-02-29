@@ -1,10 +1,15 @@
 module.exports = {
   app: {
-    port: process.env.GARECORDFY_PORT || 3001,
-    wsport: process.env.GARECORDFY_WS_PORT || 3002,
+    port: process.env.GARECORDFY_PORT || 3001, //Backend main api port
+    wsport: process.env.GARECORDFY_WS_PORT || 3002, //Websocket port for notifications
     storage: {
-      port: 19605,
+      port: 19605, //Static files storage port
     },
+    verficationEmails: [
+      //"gf.cavagliano@grupoavant.com.do",
+      "h.acosta@grupoavant.com.do",
+      "acostahenry7@gmail.com",
+    ],
   },
   db: {
     host: "localhost",

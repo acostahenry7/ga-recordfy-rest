@@ -29,7 +29,7 @@ sockserver.on("connection", (ws) => {
   //0 9 */1 * *
   let productionCron = "30 8,13,16 * * 0-6";
   let devCron = "*/60 * * * * *";
-  cron.schedule(productionCron, async () => {
+  cron.schedule(devCron, async () => {
     const [notifications] = await db.sequelize.query(`
     select rf.record_file_id, rf.name, ft.name as file_type, rf.expiration_date,
     r.record_id, c.customer_name
@@ -38,7 +38,7 @@ sockserver.on("connection", (ws) => {
     join beneficiary b on (rf.beneficiary_id = b.beneficiary_id)
 	  join record r on (b.record_id = r.record_id)
     join customer c on (r.customer_id = c.customer_id)
-    WHERE expiration_date::date = CURRENT_DATE
+    WHERE expiration_date::date <= CURRENT_DATE
     AND rf.status_type <> 'DELETED'`);
     console.log(notifications);
     ws.send(JSON.stringify(notifications));

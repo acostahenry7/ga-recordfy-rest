@@ -39,6 +39,29 @@ module.exports = function (injectedStore) {
       });
   }
 
+  async function update(id, data) {
+    console.log(id);
+    return FileType.update(
+      {
+        name: data.name,
+        prefix: data.prefix,
+        last_modified_by: data.lastModifiedBy,
+      },
+      {
+        where: {
+          file_type_id: id,
+        },
+      }
+    )
+      .then((fileType) => {
+        return fileType;
+      })
+      .catch((err) => {
+        console.log(err);
+        throw error(err);
+      });
+  }
+
   // async function update(id, data) {
   //   //Validate if the fileType is not being used by any other entity
   //   const fileType = await store.get(
@@ -56,5 +79,6 @@ module.exports = function (injectedStore) {
   return {
     get,
     insert,
+    update,
   };
 };

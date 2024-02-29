@@ -11,16 +11,23 @@ const error = require("../../../network/errors");
 
 module.exports = function (injectedStore) {
   async function get(data) {
-    let [...beneficiaryFileType] = await BeneficiaryFileType.findAll();
+    let [...beneficiaryFileType] = await BeneficiaryFileType.findAll({
+      include: [
+        {
+          model: FileType,
+        },
+      ],
+    });
     beneficiaryFileType = beneficiaryFileType.map((item) => item.dataValues);
 
     console.log(data);
 
     const getFileAmount = (
       beneficiaryType,
-      { isPep, isPolitician, isPoliticianRelative } = {}
+      { isPep, isPolitician, isPoliticianRelative } = {},
+      recordFiles
     ) => {
-      return beneficiaryFileType.filter((item) => {
+      let result = beneficiaryFileType.filter((item) => {
         if (
           item.beneficiary_type == beneficiaryType ||
           (isPep == true &&
@@ -32,7 +39,59 @@ module.exports = function (injectedStore) {
         ) {
           return true;
         }
-      }).length;
+      });
+
+      // let fileteredResults = [];
+
+      // result.forEach((item) => {
+      //   let isAlreadyUploaded =
+      //     recordFiles.filter(
+      //       (rf) => rf.dataValues.file_type_id == item.file_type_id
+      //     ).length > 0;
+
+      //   if (!isAlreadyUploaded) {
+      //     fileteredResults.push(item);
+      //   }
+      // });
+
+      // console.log("RESULTADOS", fileteredResults[0].file_type);
+
+      return result;
+    };
+
+    const getMissingFiles = (
+      beneficiaryType,
+      { isPep, isPolitician, isPoliticianRelative } = {},
+      recordFiles
+    ) => {
+      let result = beneficiaryFileType.filter((item) => {
+        if (
+          item.beneficiary_type == beneficiaryType ||
+          (isPep == true &&
+            item.beneficiary_type == `${beneficiaryType}_PEP`) ||
+          (isPolitician == true &&
+            item.beneficiary_type == `${beneficiaryType}_POLITICIAN`) ||
+          (isPoliticianRelative == true &&
+            item.beneficiary_type == `${beneficiaryType}_POLITICIAN_RELATIVE`)
+        ) {
+          return true;
+        }
+      });
+
+      let fileteredResults = [];
+
+      result.forEach((item) => {
+        let isAlreadyUploaded =
+          recordFiles.filter(
+            (rf) => rf.dataValues.file_type_id == item.file_type_id
+          ).length > 0;
+
+        if (!isAlreadyUploaded) {
+          fileteredResults.push(item);
+        }
+      });
+
+      return fileteredResults;
     };
 
     return Record.findAll({
@@ -81,6 +140,15 @@ module.exports = function (injectedStore) {
                   },
                 ],
               },
+              {
+                [Op.and]: [
+                  {
+                    customer_type: {
+                      [Op.like]: `%${data.customerType || ""}%`,
+                    },
+                  },
+                ],
+              },
             ],
           },
         },
@@ -118,7 +186,22 @@ module.exports = function (injectedStore) {
                   isPoliticianRelative:
                     record[i].beneficiaries[j].dataValues
                       .is_politician_relative,
-                }
+                },
+                record[i].beneficiaries[j].dataValues.record_files
+              );
+
+            record[i].beneficiaries[j].dataValues.missing_files =
+              getMissingFiles(
+                record[i].beneficiaries[j].dataValues.beneficiary_type,
+                {
+                  isPep: record[i].beneficiaries[j].dataValues.is_pep,
+                  isPolitician:
+                    record[i].beneficiaries[j].dataValues.is_politician,
+                  isPoliticianRelative:
+                    record[i].beneficiaries[j].dataValues
+                      .is_politician_relative,
+                },
+                record[i].beneficiaries[j].dataValues.record_files
               );
           }
         }

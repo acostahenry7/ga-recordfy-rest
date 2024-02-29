@@ -23,6 +23,9 @@ module.exports = (sequelize, Sequelize) => {
       verification_token: {
         type: Sequelize.STRING,
       },
+      can_signin: {
+        type: Sequelize.BOOLEAN,
+      },
     },
     {
       schema: "public",
