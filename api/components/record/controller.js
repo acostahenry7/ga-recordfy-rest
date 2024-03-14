@@ -220,6 +220,12 @@ module.exports = function (injectedStore) {
   }
 
   async function insert(data) {
+    let [customer] = await sequelize.query(`
+    select customer_name, customer_type, identification_type, identification_number, nationality 
+    from customer
+    where customer_id = '${data.customerId}'
+    `);
+
     Record.create({
       record_code: data.recordCode,
       customer_id: data.customerId,
@@ -243,6 +249,29 @@ module.exports = function (injectedStore) {
           is_politician: b.isPolitician,
           is_politician_relative: b.isPoliticianRelative,
         }));
+
+        if (customer[0].customer_type == "LEGAL_PERSON") {
+          Beneficiary.create({
+            record_id: record.dataValues.record_id,
+            order: data.beneficiaries.length,
+            beneficiary_type: "LEGAL_PERSON",
+            name: customer[0].customer_name,
+            identification_type: customer[0].identification_type,
+            identification_number: customer[0].identification_number,
+            nationality: customer[0].nationality,
+            stocks_percentage: 0,
+            is_pep: null,
+            is_politician: null,
+            is_politician_relative: null,
+          })
+            .then(() => {
+              console.log("BUSINESS RECORD CREATED");
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        }
+
         Beneficiary.bulkCreate(beneficiaries)
           .then((res) => {
             Record.find;
