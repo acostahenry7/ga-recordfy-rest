@@ -14,6 +14,12 @@ module.exports = (sequelize, Sequelize) => {
       beneficiary_type: {
         type: Sequelize.STRING,
       },
+      created_by: {
+        type: Sequelize.STRING,
+      },
+      last_modified_by: {
+        type: Sequelize.STRING,
+      },
       status_type: {
         type: Sequelize.STRING,
       },

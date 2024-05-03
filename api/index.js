@@ -29,7 +29,7 @@ sockserver.on("connection", (ws) => {
   //0 9 */1 * *
   let productionCron = "30 8,13,16 * * 0-6";
   let devCron = "*/60 * * * * *";
-  cron.schedule(devCron, async () => {
+  cron.schedule(productionCron, async () => {
     const [notifications] = await db.sequelize.query(`
     select rf.record_file_id, rf.name, ft.name as file_type, rf.expiration_date,
     r.record_id, c.customer_name

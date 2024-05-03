@@ -1,7 +1,10 @@
-const error = require("../../../network/errors");
+const error = require("../../../utils/error");
 const db = require("../../../store/models");
 const BeneficiaryTypeFile = db.beneficiaryFileType;
 const FileType = db.fileType;
+const RecordFile = db.recordFile;
+const Beneficiary = db.beneficiary;
+const Op = db.op;
 
 module.exports = function (injectedStore) {
   // let store = injectedStore;
@@ -15,9 +18,15 @@ module.exports = function (injectedStore) {
 
   async function get(data) {
     return BeneficiaryTypeFile.findAll({
-      include: FileType,
+      where: {
+        status_type: {
+          [Op.notLike]: "DELETED",
+        },
+      },
+      include: [FileType],
     })
       .then((beneficiaryTypeFile) => {
+        console.log("#########", beneficiaryTypeFile);
         return beneficiaryTypeFile;
       })
       .catch((err) => {
@@ -29,6 +38,48 @@ module.exports = function (injectedStore) {
     return BeneficiaryTypeFile.bulkCreate(data.bTypeFiles)
       .then((bft) => {
         return bft;
+      })
+      .catch((err) => {
+        console.log(err);
+        throw error(err);
+      });
+  }
+
+  async function remove(id, data) {
+    let foundFiles = await RecordFile.findAll({
+      where: {
+        file_type_id: data.file_type_id,
+        status_type: {
+          [Op.notLike]: "DELETED",
+        },
+      },
+      include: [Beneficiary],
+    });
+
+    console.log(foundFiles);
+
+    if (foundFiles.length > 0) {
+      throw error(
+        JSON.stringify({
+          msg: "Estos archivos hacen uso de este tipo de archivo",
+          detail: foundFiles,
+        }),
+        406
+      );
+    }
+
+    return BeneficiaryTypeFile.update(
+      {
+        status_type: "DELETED",
+      },
+      {
+        where: {
+          beneficiary_type_file_id: id,
+        },
+      }
+    )
+      .then((bFileType) => {
+        return bFileType;
       })
       .catch((err) => {
         console.log(err);
@@ -53,5 +104,6 @@ module.exports = function (injectedStore) {
   return {
     get,
     insert,
+    remove,
   };
 };

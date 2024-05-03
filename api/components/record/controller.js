@@ -12,9 +12,19 @@ const error = require("../../../network/errors");
 module.exports = function (injectedStore) {
   async function get(data) {
     let [...beneficiaryFileType] = await BeneficiaryFileType.findAll({
+      where: {
+        status_type: {
+          [Op.notLike]: "DELETED",
+        },
+      },
       include: [
         {
           model: FileType,
+          where: {
+            status_type: {
+              [Op.notLike]: "DELETED",
+            },
+          },
         },
       ],
     });

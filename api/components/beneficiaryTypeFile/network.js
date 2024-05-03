@@ -37,6 +37,18 @@ router.put("/:id", verifyToken, (req, res) => {
     });
 });
 
+router.delete("/:id", verifyToken, (req, res) => {
+  console.log(req.body);
+  controller
+    .remove(req.params.id, req.body)
+    .then((msg) => {
+      response.success(req, res, msg, 200);
+    })
+    .catch((err) => {
+      response.error(req, res, err.message, err.statusCode);
+    });
+});
+
 // router.delete("/:id", (req, res) => {
 //     c
 // })

@@ -1,6 +1,10 @@
-const error = require("../../../network/errors");
+const error = require("../../../utils/error");
 const db = require("../../../store/models");
 const FileType = db.fileType;
+const RecordFile = db.recordFile;
+const Beneficiary = db.beneficiary;
+const BeneficiaryFileType = db.beneficiaryFileType;
+const Op = db.op;
 
 module.exports = function (injectedStore) {
   // let store = injectedStore;
@@ -13,7 +17,13 @@ module.exports = function (injectedStore) {
   // }
 
   async function get(data) {
-    return FileType.findAll()
+    return FileType.findAll({
+      where: {
+        status_type: {
+          [Op.notLike]: "DELETED",
+        },
+      },
+    })
       .then((fileType) => {
         return fileType;
       })
@@ -62,6 +72,66 @@ module.exports = function (injectedStore) {
       });
   }
 
+  async function remove(id) {
+    let foundFiles = await RecordFile.findAll({
+      where: {
+        file_type_id: id,
+        status_type: {
+          [Op.notLike]: "DELETED",
+        },
+      },
+      include: [Beneficiary],
+    });
+
+    console.log(foundFiles);
+
+    if (foundFiles.length > 0) {
+      throw error(
+        JSON.stringify({
+          msg: "Estos archivos hacen uso de este tipo de archivo",
+          detail: foundFiles,
+        }),
+        406
+      );
+    }
+
+    return FileType.update(
+      {
+        status_type: "DELETED",
+      },
+      {
+        where: {
+          file_type_id: id,
+        },
+      }
+    )
+      .then((fileType) => {
+        return fileType;
+      })
+      .catch((err) => {
+        console.log(err);
+        throw error(err);
+      });
+  }
+
+  // FileType.update(
+  //   {
+  //     status_type: "DELETE",
+  //   },
+  //   {
+  //     where: {
+  //       file_type_id: id,
+  //     },
+  //   }
+  // )
+  //   .then((fileType) => {
+  //     return fileType;
+  //   })
+  //   .catch((err) => {
+  //     console.log(err);
+  //     throw error(err);
+  //   });
+
   // async function update(id, data) {
   //   //Validate if the fileType is not being used by any other entity
   //   const fileType = await store.get(
@@ -80,5 +150,6 @@ module.exports = function (injectedStore) {
     get,
     insert,
     update,
+    remove,
   };
 };
