@@ -96,6 +96,9 @@ module.exports = (sequelize, Sequelize) => {
       is_politician_relative: {
         type: Sequelize.BOOLEAN,
       },
+      status_type: {
+        type: Sequelize.STRING,
+      },
       created_by: {
         type: Sequelize.STRING,
       },

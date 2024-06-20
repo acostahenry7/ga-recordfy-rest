@@ -1,8 +1,11 @@
 const db = require("../../../store/models");
+const error = require("../../../utils/error");
 
 //Sequelize Models
 const Customer = db.customer;
 const Record = db.record;
+const RecordFile = db.recordFile;
+const Beneficiary = db.beneficiary;
 const Op = db.op;
 const sequelize = db.sequelize;
 
@@ -28,6 +31,15 @@ module.exports = function (injectedStore) {
                 [Op.like]: `%${data.customerName?.toLowerCase() || ""}%`,
               }
             ),
+            {
+              [Op.and]: [
+                {
+                  status_type: {
+                    [Op.like]: "ENABLED",
+                  },
+                },
+              ],
+            },
             {
               [Op.and]: [
                 {
@@ -131,6 +143,32 @@ module.exports = function (injectedStore) {
   }
 
   async function update(customerId, data) {
+    Record.findOne({
+      where: {
+        customer_id: customerId,
+        [Op.and]: {
+          status_type: {
+            [Op.notLike]: "DELETED",
+          },
+        },
+      },
+    }).then((record) => {
+      Beneficiary.update(
+        {
+          is_pep: data.isPep,
+          is_politician: data.isPolitician,
+          is_politician_relative: data.isPoliticianRelative,
+        },
+        {
+          where: {
+            record_id: record.record_id,
+          },
+        }
+      ).then((b) => {
+        console.log(`Beneficiary updated! ${b}`);
+      });
+    });
+
     return Customer.update(
       {
         customer_name: data.customerName,
@@ -174,6 +212,88 @@ module.exports = function (injectedStore) {
     });
   }
 
+  async function remove(customerId) {
+    console.log("HERE IN REMOVE");
+    return Customer.update(
+      {
+        status_type: "DELETED",
+      },
+      {
+        returning: true,
+        where: {
+          customer_id: customerId,
+        },
+      }
+    )
+      .then((customer) => {
+        Record.update(
+          {
+            status_type: "DELETED",
+          },
+          {
+            returning: true,
+            where: {
+              customer_id: customerId,
+            },
+          }
+        )
+          .then((record) => {
+            if (record[0] != 0) {
+              Beneficiary.update(
+                {
+                  status_type: "DELETED",
+                },
+                {
+                  returning: true,
+                  where: {
+                    record_id: record[1][0].record_id,
+                  },
+                }
+              )
+                .then((beneficiary) => {
+                  console.log("BENEFICIARY", beneficiary);
+                  if (beneficiary[0] != 0) {
+                    RecordFile.update(
+                      {
+                        status_type: "DELETED",
+                      },
+                      {
+                        where: {
+                          beneficiary_id: [
+                            ...beneficiary[1].map((b) => b.beneficiary_id),
+                          ],
+                        },
+                      }
+                    )
+                      .then((recordFile) => {
+                        return customer;
+                      })
+                      .catch((err) => {
+                        console.log(err);
+                        throw error(err);
+                      });
+                  } else {
+                    return customer;
+                  }
+                })
+                .catch((err) => {
+                  console.log(err);
+                  throw error(err);
+                });
+            } else {
+              return customer;
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+            throw error(err);
+          });
+      })
+      .catch((err) => {
+        console.log(err);
+        throw error(err);
+      });
+  }
   // async function update(id, data) {
   //   //Validate if the customer is not being used by any other entity
   //   const customer = await store.get(
@@ -195,5 +315,6 @@ module.exports = function (injectedStore) {
     get,
     insert,
     update,
+    remove,
   };
 };

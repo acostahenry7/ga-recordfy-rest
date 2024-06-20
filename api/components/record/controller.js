@@ -124,6 +124,15 @@ module.exports = function (injectedStore) {
               {
                 [Op.and]: [
                   {
+                    status_type: {
+                      [Op.notLike]: `DELETED`,
+                    },
+                  },
+                ],
+              },
+              {
+                [Op.and]: [
+                  {
                     identification_number: {
                       [Op.like]: `%${data.identificationNumber || ""}%`,
                     },

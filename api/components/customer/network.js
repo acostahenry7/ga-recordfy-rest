@@ -37,4 +37,16 @@ router.put("/:id", verifyToken, (req, res) => {
     });
 });
 
+router.delete("/:id", verifyToken, (req, res) => {
+  console.log(req.params.id);
+  controller
+    .remove(req.params.id)
+    .then((msg) => {
+      response.success(req, res, msg, 200);
+    })
+    .catch((err) => {
+      response.error(req, res, err.message, err.statusCode);
+    });
+});
+
 module.exports = router;
