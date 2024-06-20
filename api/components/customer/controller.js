@@ -136,6 +136,7 @@ module.exports = function (injectedStore) {
         created_by: data.createdBy,
         last_modified_by: data.lastModifiedBy,
         risk_level: data.riskLevel,
+        status_type: "ENABLED",
       }).then((createdCustomer) => {
         return createdCustomer.dataValues;
       });
