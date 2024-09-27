@@ -131,25 +131,25 @@ function generateReport(data, configParams) {
     text: `Adjunto archivo en pdf`,
   };
 
-  // transporter.sendMail(mailOptions, (err, info) => {
-  //   if (err) {
-  //     console.log(err);
-  //     //res.send({ sent: false });
-  //   } else {
-  //     console.log("Emal sent: ", info);
-  //     //res.send({ sent: true });
-  //   }
-  // });
+  transporter.sendMail(mailOptions, (err, info) => {
+    if (err) {
+      console.log(err);
+      //res.send({ sent: false });
+    } else {
+      console.log("Emal sent: ", info);
+      //res.send({ sent: true });
+    }
+  });
 
-  // setTimeout(() => {
-  //   fs.unlink(`${__dirname}/${fileName}`, (err) => {
-  //     if (err) {
-  //       throw err;
-  //     }
+  setTimeout(() => {
+    fs.unlink(`${__dirname}/${fileName}`, (err) => {
+      if (err) {
+        throw err;
+      }
 
-  //     console.log("File deleted!");
-  //   });
-  // }, 2000);
+      console.log("File deleted!");
+    });
+  }, 2000);
 }
 
 function renderHeader(params) {

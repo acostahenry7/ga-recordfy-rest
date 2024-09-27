@@ -82,6 +82,6 @@ db.sequelize.sync();
 
 //Crontabs for reports
 expiringDocsCron();
-//expiredDocsCron();
+expiredDocsCron();
 
 // generateReport();
