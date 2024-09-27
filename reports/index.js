@@ -127,7 +127,7 @@ function generateReport(data, configParams) {
         path: `${__dirname}/${fileName}`,
       },
     ],
-    subject: "Reporte de documentos por vencer",
+    subject: configParams.mailFilename.split("-").join(" "),
     text: `Adjunto archivo en pdf`,
   };
 
