@@ -4,7 +4,7 @@
   "description": "RESTFUL Api for ga-recordfy web app",
   "main": "index.js",
   "scripts": {
-    "start": "node ./api/index.js",
+    "start": "SET NODE_ENV=production & node ./api/index.js",
     "test": "nodemon ./api/index.js"
   },
   "keywords": [],
@@ -17,6 +17,7 @@
     "express": "^4.18.2",
     "fs": "^0.0.1-security",
     "jsonwebtoken": "^9.0.2",
+    "jspdf": "^2.5.1",
     "multer": "^1.4.5-lts.1",
     "node-cron": "^3.0.3",
     "nodemailer": "^6.9.5",

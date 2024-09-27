@@ -5,6 +5,7 @@ const cors = require("cors");
 const path = require("path");
 const cron = require("node-cron");
 const db = require("../store/models");
+const { expiringDocsCron, expiredDocsCron } = require("../crontabs/reports");
 //const { db } = require("../store/postgres");
 
 //Microservices components
@@ -21,6 +22,7 @@ const errors = require("../network/errors");
 const app = express();
 
 const { WebSocketServer } = require("ws");
+const { generateReport } = require("../reports");
 const sockserver = new WebSocketServer({ port: config.app.wsport });
 process.env.TZ = "America/Santo_Domingo";
 
@@ -77,3 +79,9 @@ app.listen(config.app.port, () => {
 });
 
 db.sequelize.sync();
+
+//Crontabs for reports
+expiringDocsCron();
+//expiredDocsCron();
+
+// generateReport();
