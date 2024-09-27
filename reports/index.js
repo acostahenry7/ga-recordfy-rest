@@ -119,7 +119,11 @@ function generateReport(data, configParams) {
   let mailOptions = {
     from: "GaRecordfy <grupoavant.tablet@gmail.com",
     // from: "graceinternationalexchange@gmail.com",
-    to: ["h.acosta@grupoavant.com.do"],
+    to: [
+      "h.acosta@grupoavant.com.do",
+      "gf.cavagliano@grupoavant.com.do",
+      "l.feliz@grupoavant.com.do",
+    ],
     attachments: [
       {
         filename:
