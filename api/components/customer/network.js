@@ -38,7 +38,6 @@ router.put("/:id", verifyToken, (req, res) => {
 });
 
 router.delete("/:id", verifyToken, (req, res) => {
-  console.log(req.params.id);
   controller
     .remove(req.params.id)
     .then((msg) => {

@@ -26,7 +26,6 @@ module.exports = function (injectedStore) {
       include: [FileType],
     })
       .then((beneficiaryTypeFile) => {
-        console.log("#########", beneficiaryTypeFile);
         return beneficiaryTypeFile;
       })
       .catch((err) => {

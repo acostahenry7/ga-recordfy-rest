@@ -38,7 +38,7 @@ sockserver.on("connection", (ws) => {
     from record_file rf
     join file_type ft on (rf.file_type_id = ft.file_type_id)
     join beneficiary b on (rf.beneficiary_id = b.beneficiary_id)
-	  join record r on (b.record_id = r.record_id)
+    join record r on (b.record_id = r.record_id)
     join customer c on (r.customer_id = c.customer_id)
     WHERE expiration_date::date <= CURRENT_DATE
     AND rf.status_type <> 'DELETED'`);

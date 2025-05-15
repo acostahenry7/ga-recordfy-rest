@@ -10,7 +10,6 @@ const config = require("../../../config");
 
 const storage = multer.diskStorage({
   destination(req, res, cb) {
-    console.log("NO PUEDE SER ###############################", req.body);
     const route = path.join(
       __dirname,
       `../../../data/${req.body.beneficiaryId}`
@@ -44,8 +43,6 @@ let upload = multer({ storage });
 
 // router.post("/update", upload.single("file"), update);
 router.post("/upload", upload.single("file"), (req, res) => {
-  console.log(req.body);
-
   controller
     .insert(req.body)
     .then((msg) => {
@@ -109,19 +106,16 @@ router.delete("/", (req, res) => {
   );
   let fileName = location.slice(location.lastIndexOf("/") + 1, location.length);
 
-  console.log(dirName);
   fs.unlink(
     path.join(__dirname, `../../../data/${dirName}/${fileName}`),
     (err) => {
       if (err) {
         console.log(err);
       } else {
-        console.log("borrado");
+        console.log("File deleted!");
       }
     }
   );
-
-  console.log(req.query.recordFileId);
 
   controller
     .remove(req.query.recordFileId)

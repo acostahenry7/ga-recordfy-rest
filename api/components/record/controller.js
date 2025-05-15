@@ -30,13 +30,13 @@ module.exports = function (injectedStore) {
     });
     beneficiaryFileType = beneficiaryFileType.map((item) => item.dataValues);
 
-    console.log(data);
-
     const getFileAmount = (
       beneficiaryType,
       { isPep, isPolitician, isPoliticianRelative } = {},
       recordFiles
     ) => {
+      console.log("##########################", beneficiaryFileType.length);
+
       let result = beneficiaryFileType.filter((item) => {
         if (
           item.beneficiary_type == beneficiaryType ||
@@ -254,7 +254,6 @@ module.exports = function (injectedStore) {
       last_modified_by: data.lastModifiedBy,
     })
       .then((record) => {
-        console.log(record);
         let beneficiaries = data.beneficiaries.map((b) => ({
           record_id: record.dataValues.record_id,
           order: b.order,

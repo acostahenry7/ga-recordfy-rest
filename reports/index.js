@@ -121,8 +121,8 @@ function generateReport(data, configParams) {
     // from: "graceinternationalexchange@gmail.com",
     to: [
       "h.acosta@grupoavant.com.do",
-      "gf.cavagliano@grupoavant.com.do",
-      "l.feliz@grupoavant.com.do",
+      //"gf.cavagliano@grupoavant.com.do",
+      //"l.feliz@grupoavant.com.do",
     ],
     attachments: [
       {
@@ -138,10 +138,10 @@ function generateReport(data, configParams) {
   transporter.sendMail(mailOptions, (err, info) => {
     if (err) {
       console.log(err);
-      //res.send({ sent: false });
+      res.send({ sent: false });
     } else {
       console.log("Emal sent: ", info);
-      //res.send({ sent: true });
+      res.send({ sent: true });
     }
   });
 

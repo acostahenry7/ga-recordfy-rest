@@ -1,6 +1,4 @@
 function generateWhereConditions(obj, needWhereStatement, isHaving) {
-  console.log("GENERATE", obj);
-
   let whereString = "";
 
   Object?.entries(obj).forEach((condition, index) => {
@@ -24,7 +22,6 @@ function generateWhereConditions(obj, needWhereStatement, isHaving) {
               ? `AND ${condition[0]} = '${condition[1]}' `
               : "";
         } else if (condition[0].includes("_id")) {
-          console.log("HERE");
           whereString +=
             condition[1]?.length > 0
               ? `AND lower(${
@@ -42,8 +39,6 @@ function generateWhereConditions(obj, needWhereStatement, isHaving) {
       }
     }
   });
-
-  console.log("KING ##########", obj);
 
   if (obj.first_name || obj.last_name) {
     whereString += `AND lower(first_name || ' ' || last_name ) LIKE '%${obj.first_name}%'`;

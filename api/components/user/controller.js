@@ -16,7 +16,6 @@ module.exports = function (injectedStore) {
   function get(queryParams) {
     // console.log(queryParams);
     const conditions = userProfileModel(queryParams, "find");
-    console.log(conditions);
 
     return store.get(TABLE, conditions);
   }
@@ -27,7 +26,6 @@ module.exports = function (injectedStore) {
     let user = await store.get("auth", { username: data.username });
 
     if (user.length > 0) {
-      console.log("hiiiiiii");
       return new Promise((resolve, reject) =>
         reject(new Error("User already exists!"))
       );

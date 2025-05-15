@@ -20,7 +20,6 @@ module.exports = function (injectedStore) {
   }
 
   async function get(data) {
-    console.log(data);
     try {
       return await Customer.findAll({
         where: {
@@ -95,7 +94,6 @@ module.exports = function (injectedStore) {
   }
 
   async function insert(data) {
-    console.log(data);
     return Customer.findOne({
       where: {
         identification_number: data.identificationNumber,
@@ -214,7 +212,6 @@ module.exports = function (injectedStore) {
   }
 
   async function remove(customerId) {
-    console.log("HERE IN REMOVE");
     return Customer.update(
       {
         status_type: "DELETED",
@@ -252,7 +249,6 @@ module.exports = function (injectedStore) {
                 }
               )
                 .then((beneficiary) => {
-                  console.log("BENEFICIARY", beneficiary);
                   if (beneficiary[0] != 0) {
                     RecordFile.update(
                       {

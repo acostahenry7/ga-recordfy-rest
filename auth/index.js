@@ -3,7 +3,7 @@ const config = require("../config");
 const error = require("../utils/error");
 
 function sign(payload) {
-  return jwt.sign(payload, config.security.secret, { expiresIn: "4h" });
+  return jwt.sign(payload, config.security.secret, { expiresIn: "1h" });
 }
 
 function verifyToken(req, res, next) {

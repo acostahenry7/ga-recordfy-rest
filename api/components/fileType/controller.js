@@ -83,8 +83,6 @@ module.exports = function (injectedStore) {
       include: [Beneficiary],
     });
 
-    console.log(foundFiles);
-
     if (foundFiles.length > 0) {
       throw error(
         JSON.stringify({

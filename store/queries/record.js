@@ -3,8 +3,6 @@ const { generateWhereConditions } = require("../../utils/store");
 const queries = {};
 
 queries.listDetailedRecords = (data) => {
-  console.log("DATA", data);
-
   return `SELECT r.record_id, record_code, r.customer_id, r.status, r.created_by, r.created_at, r.modified_at, r.modified_by,
 	COUNT(record_file_id) as file_amount, c.customer_name, c.identification_number, c.phone_number, ct.name as customer_type,
 	r.number_of_partners

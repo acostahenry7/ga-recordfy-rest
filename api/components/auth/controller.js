@@ -41,7 +41,6 @@ async function signup(data) {
       created_by: data.createdBy,
       last_modified_by: data.lastModifiedBy,
     }).then((userProfile) => {
-      console.log(userProfile);
       return Auth.create({
         username: data.username,
         password: bcrypt.hashSync(data.password, 8),
@@ -151,14 +150,12 @@ async function verify(params) {
             },
             { where: { username: params.username } }
           ).then(() => {
-            console.log("NO PUEDE SER ", auth);
             return;
           });
         }
       }
     })
     .catch((err) => {
-      console.log(err);
       throw error(err.message);
     });
 }

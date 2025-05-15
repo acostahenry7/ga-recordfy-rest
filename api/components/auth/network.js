@@ -19,7 +19,6 @@ router.post("/signin", (req, res) => {
   controller
     .signin(req.body)
     .then((message) => {
-      console.log(message);
       response.success(req, res, message, 200);
     })
     .catch((err) => {
@@ -42,7 +41,6 @@ router.post(
 );
 
 router.get("/verify", (req, res) => {
-  //console.log("token", req.query);
   controller
     .verify(req.query)
     .then((msg) => {

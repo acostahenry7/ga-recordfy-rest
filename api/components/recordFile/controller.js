@@ -41,8 +41,10 @@ module.exports = function (injectedStore) {
       beneficiary_id: data.beneficiaryId,
       file_type_id: data.fileTypeId,
       source: data.fileLocation,
-      expiration_date: data.expirationDate,
-      doc_creation_date: data.docCreationDate,
+      expiration_date:
+        data.expirationDate == "null" ? null : data.expirationDate,
+      doc_creation_date:
+        data.docCreationDate == "null" ? null : data.docCreationDate,
       status_type: "CREATED",
       created_by: data.createdBy,
       last_modified_by: data.lastModifiedBy,
@@ -110,7 +112,6 @@ module.exports = function (injectedStore) {
       }
     )
       .then((recordFile) => {
-        console.log(recordFile);
         return recordFile;
       })
       .catch((err) => {

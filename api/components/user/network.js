@@ -6,7 +6,6 @@ const response = require("../../../network/response");
 const controller = require("./index");
 
 router.get("/", verifyToken, (req, res) => {
-  console.log("USER NETWORK GET ", req.query);
   if (Object.keys(req.query).length > 0) {
     controller
       .get(req.query)

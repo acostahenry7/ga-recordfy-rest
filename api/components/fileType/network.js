@@ -44,7 +44,6 @@ router.delete("/:id", verifyToken, (req, res) => {
       response.success(req, res, msg, 200);
     })
     .catch((err) => {
-      console.log(err.statusCode);
       response.error(req, res, err.message, err.statusCode);
     });
 });
