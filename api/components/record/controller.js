@@ -2,6 +2,7 @@ const db = require("../../../store/models");
 const Customer = db.customer;
 const Record = db.record;
 const RecordFile = db.recordFile;
+const OtherFile = db.otherFile;
 const Beneficiary = db.beneficiary;
 const BeneficiaryFileType = db.beneficiaryFileType;
 const FileType = db.fileType;
@@ -186,6 +187,16 @@ module.exports = function (injectedStore) {
               include: [FileType],
             },
           ],
+        },
+        {
+          model: OtherFile,
+          required: false,
+          where: {
+            status_type: {
+              [Op.not]: "DELETED",
+            },
+          },
+          include: [FileType],
         },
       ],
       order: [[Beneficiary, RecordFile, "created_at", "DESC"]],

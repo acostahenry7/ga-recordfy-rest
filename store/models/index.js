@@ -42,6 +42,9 @@ db.customer = require("../models/customer")(sequelize, Sequelize);
 db.fileType = require("../models/fileType")(sequelize, Sequelize);
 db.record = require("../models/record")(sequelize, Sequelize);
 db.recordFile = require("../models/recordFile")(sequelize, Sequelize);
+db.otherFile = require("../models/otherFile")(sequelize, Sequelize);
+
+db.otherFile.sync({ alter: true });
 
 //Asociations
 
@@ -60,6 +63,14 @@ db.record.hasMany(db.beneficiary, {
 });
 
 db.beneficiary.belongsTo(db.record, {
+  foreignKey: "record_id",
+});
+
+//Record - Other file
+db.record.hasMany(db.otherFile, {
+  foreignKey: "record_id",
+});
+db.otherFile.belongsTo(db.record, {
   foreignKey: "record_id",
 });
 
@@ -87,6 +98,14 @@ db.recordFile.belongsTo(db.fileType, {
 });
 
 db.fileType.hasMany(db.recordFile, {
+  foreignKey: "file_type_id",
+});
+//OtherFile - FileType
+db.otherFile.belongsTo(db.fileType, {
+  foreignKey: "file_type_id",
+});
+
+db.fileType.hasMany(db.otherFile, {
   foreignKey: "file_type_id",
 });
 

@@ -81,6 +81,7 @@ module.exports = function (injectedStore) {
             },
           ],
         },
+        order: [["created_at", "DESC"]],
         include: [
           {
             model: Record,
@@ -152,20 +153,22 @@ module.exports = function (injectedStore) {
         },
       },
     }).then((record) => {
-      Beneficiary.update(
-        {
-          is_pep: data.isPep,
-          is_politician: data.isPolitician,
-          is_politician_relative: data.isPoliticianRelative,
-        },
-        {
-          where: {
-            record_id: record.record_id,
+      if (record?.record_id) {
+        Beneficiary.update(
+          {
+            is_pep: data.isPep,
+            is_politician: data.isPolitician,
+            is_politician_relative: data.isPoliticianRelative,
           },
-        }
-      ).then((b) => {
-        console.log(`Beneficiary updated! ${b}`);
-      });
+          {
+            where: {
+              record_id: record.record_id,
+            },
+          }
+        ).then((b) => {
+          console.log(`Beneficiary updated! ${b}`);
+        });
+      }
     });
 
     return Customer.update(

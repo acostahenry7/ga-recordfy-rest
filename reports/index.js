@@ -121,8 +121,8 @@ function generateReport(data, configParams) {
     // from: "graceinternationalexchange@gmail.com",
     to: [
       "h.acosta@grupoavant.com.do",
-      //"gf.cavagliano@grupoavant.com.do",
-      //"l.feliz@grupoavant.com.do",
+      "gf.cavagliano@grupoavant.com.do",
+      "l.feliz@grupoavant.com.do",
     ],
     attachments: [
       {

@@ -16,6 +16,7 @@ const customer = require("./components/customer/network");
 const beneficiaryTypeFile = require("./components/beneficiaryTypeFile/network");
 const fileType = require("./components/fileType/network");
 const recordFile = require("./components/recordFile/network");
+const otherFile = require("./components/otherFile/network");
 const record = require("./components/record/network");
 const errors = require("../network/errors");
 
@@ -67,6 +68,7 @@ app.use("/api/customer", customer);
 app.use("/api/beneficiary-type-file", beneficiaryTypeFile);
 app.use("/api/file-type", fileType);
 app.use("/api/record-file", recordFile);
+app.use("/api/other-file", otherFile);
 app.use("/api/record", record);
 
 //Static Content
