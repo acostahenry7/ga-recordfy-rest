@@ -12,7 +12,7 @@ module.exports = {
     ],
   },
   db: {
-    host: "localhost",
+    host: "unixapi.grupoavant.com.do",
     user: "postgres",
     password: "postgres",
     dbname: "garecordfy",
